@@ -571,7 +571,26 @@ ad_proc -public im_cost_status_select { select_name { default "" } } {
     Returns an html select box named $select_name and defaulted to
     $default with a list of all the cost status_types in the system
 } {
-    return [im_category_select "Intranet Cost Status" $select_name $default]
+    set include_empty 0
+    set options [util_memoize "im_cost_status_options $include_empty"]
+
+    set result "\n<select name=\"$select_name\">\n"
+    if {[string equal $default ""]} {
+	append result "<option value=\"\"> -- Please select -- </option>"
+    }
+
+    foreach option $options {
+	set selected ""
+	if { [string equal $default [lindex $option 1]]} {
+	    set selected " selected"
+	}
+	append result "\t<option value=\"[util_quote_double_quotes [lindex $option 1]]\" $selected>"
+	append result "[lindex $option 0]</option>\n"
+
+    }
+
+    append result "\n</select>\n"
+    return $result
 }
 
 
