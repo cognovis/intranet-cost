@@ -12,7 +12,7 @@ ad_page_contract {
 
     @author frank.bergmann@project-open.com
 } {
-    { cost_id:integer,optional }
+    { rep_cost_id:integer,optional }
     { return_url "/intranet-cost/rep-costs/index"}
     edit_p:optional
     message:optional
@@ -42,7 +42,7 @@ set focus "cost.var_name"
 # Get everything about the cost
 # ------------------------------------------------------------------
 
-if {![exists_and_not_null cost_id]} {
+if {![exists_and_not_null rep_cost_id]} {
     # New variable: setup some reasonable defaults
 
     set page_title "New Repeating Cost Item"
@@ -79,7 +79,7 @@ ad_form \
     -mode $form_mode \
     -export {next_url user_id return_url} \
     -form {
-	cost_id:key
+	rep_cost_id:key
 	{cost_name:text(text) {label Name} {html {size 40}}}
 	{project_id:text(select),optional {label Project} {options $project_options} }
 	{customer_id:text(select) {label "Customer<br><small>(Who pays?)</small>"} {options $customer_options} }
@@ -119,8 +119,8 @@ ad_form -extend -name cost -on_request {
 		im_costs ci,
 		im_repeating_costs cr
 	where
-		ci.cost_id = :cost_id
-		and ci.cost_id = cr.cost_id
+		cr.rep_cost_id = :rep_cost_id
+		and ci.cost_id = cr.rep_cost_id
 
 } -new_data {
 
@@ -136,7 +136,7 @@ declare
 	v_cost_id	integer;
 begin
         v_cost_id := im_cost.new (
-                cost_id         => :cost_id,
+                cost_id         => :rep_cost_id,
                 creation_user   => :user_id,
                 creation_ip     => '[ad_conn peeraddr]',
                 cost_name       => :cost_name,
@@ -162,7 +162,7 @@ end;"
                 cause_object_id		= :cause_object_id,
 		start_block		= :start_block
         where
-                cost_id = :cost_id
+                cost_id = :rep_cost_id
     "
 
 
@@ -175,14 +175,14 @@ end;"
 	where	start_block <= :effective_date
     "]
 
-    set exists [db_string exists_cost "select count(*) from im_costs where cost_id=:cost_id"]
+    set exists [db_string exists_cost "select count(*) from im_costs where cost_id=:rep_cost_id"]
     if {!$exists} {
 	db_dml cost_insert "
 declare
         v_cost_id       integer;
 begin
         v_cost_id := im_cost.new (
-                cost_id         => :cost_id,
+                cost_id         => :rep_cost_id,
                 creation_user   => :user_id,
                 creation_ip     => '[ad_conn peeraddr]',
                 cost_name       => :cost_name,
@@ -224,7 +224,7 @@ end;"
                 description     	= :description,
                 note            	= :note
 	where
-		cost_id = :cost_id
+		cost_id = :rep_cost_id
 "
 } -on_submit {
 

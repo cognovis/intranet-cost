@@ -23,7 +23,6 @@ ad_page_contract {
 set user_id [ad_maybe_redirect_for_registration]
 set page_title "Create Employee Cost Item"
 set context [ad_context_bar $page_title]
-set org_start_block $start_block
 set today [db_string birthday_today "select to_char(sysdate,'YYYY-MM-DD') from dual"]
 
 if {![im_permission $user_id view_costs]} {
@@ -48,6 +47,8 @@ set currency [ad_parameter -package_id [im_package_cost_id] "DefaultCurrency" ""
 set form_mode "edit"
 
 
+set org_start_block $start_block
+
 db_1row get_rep_cost_info "
 select	
 	cr.start_date,
@@ -57,19 +58,17 @@ from
 	im_repeating_costs cr,
 	im_costs ci
 where
-	cr.cost_id = :rep_cost_id
-	and cr.cost_id = ci.cost_id
+	cr.rep_cost_id = :rep_cost_id
+	and cr.rep_cost_id = ci.cost_id
 "
 
+if {"" == $start_block} { set start_block $org_start_block }
+
+# ad_return_complaint 1 "<li>start_block = $start_block"
 
 # ------------------------------------------------------------------
 # Build the form
 # ------------------------------------------------------------------
-
-# start_block for the new cost item is the 
-# month for which the new cost item is created
-# from the rep_costs.
-set start_block $org_start_block
 
 append cost_name " - $start_block"
 set cost_id [im_new_object_id]
@@ -105,6 +104,8 @@ ad_form \
 	{cost_status_id:text(select) {label Status} {options $cost_status_options} }
 	{investment_id:text(select),optional {label Investment} {options $investment_options} }
 	{effective_date:text(text) {label "Effective Date"} {html {size 20}} }
+	{start_block:text(text) {label "Start Block"} {html {size 20}}}
+
 	{amount:text(text) {label "Amount"} {html {size 20}} }
 	{currency:text(select) {label "Currency"} {options $currency_options} }
 
@@ -112,9 +113,8 @@ ad_form \
 	{tax:text(text),optional {label "TAX"} {html {size 20}} }
 
 	{payment_days:text(hidden) }
-	{cause_object_id:text(hidden) }
+	{cause_object_id:text(text) {label "Cause Object"} {html {size 20}}}
 	{rep_cost_id:text(hidden) }
-	{start_block:text(hidden) }
 
 	{description:text(textarea),nospell,optional {label "Description"} {html {rows 5 cols 40}}}
 	{note:text(textarea),nospell,optional {label "Note"} {html {rows 5 cols 40}}}
@@ -133,34 +133,27 @@ ad_form -extend -name cost -on_request {
 
 } -after_submit {
 
-    db_dml cost_insert "
-declare
-	v_cost_id	integer;
-begin
-        v_cost_id := im_cost.new (
-                cost_id         => null,
-                creation_user   => :user_id,
-                creation_ip     => '[ad_conn peeraddr]',
-                cost_name       => :cost_name,
-		project_id	=> :project_id,
-                customer_id     => :customer_id,
-                provider_id     => :provider_id,
-                cost_status_id  => :cost_status_id,
-                cost_type_id    => :cost_type_id,
-                effective_date  => :effective_date,
-                payment_days    => :payment_days,
-		amount		=> :amount,
-                currency        => :currency,
-                vat             => :vat,
-                tax             => :tax,
-                description     => :description,
-                note            => :note
-        );
-end;"
+    set cost_id [im_cost::new \
+	-cost_name $cost_name \
+	-cost_type_id $cost_type_id \
+	-cost_status_id $cost_status_id \
+    ]
 
-    db_dml cost_update_aux "
+    db_dml cost_update "
         update  im_costs set
-                cause_object_id	= :cause_object_id
+                cause_object_id	= :cause_object_id,
+                vat = :vat,
+                tax = :tax,
+		project_id = :project_id,
+                customer_id = :customer_id,
+                provider_id = :provider_id,
+                effective_date = :effective_date,
+		start_block = :start_block,
+                payment_days = :payment_days,
+		amount = :amount,
+                currency = :currency,
+                description = :description,
+                note = :note
  	where
 		cost_id = :cost_id
     "

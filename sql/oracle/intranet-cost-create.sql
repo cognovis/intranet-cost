@@ -492,7 +492,9 @@ prompt *** intranet-costs: Creating im_costs
 create table im_costs (
 	cost_id			integer
 				constraint im_costs_pk
-				primary key,
+				primary key
+				constraint im_costs_cost_fk
+                                references acs_objects,
 	-- force a name because we may want to use object.name()
 	-- later to list cost
 	cost_name		varchar(400)
@@ -752,12 +754,11 @@ end im_cost;
 show errors
 
 
-create or replace function im_cost_del(
-	p_cost_id in integer
-) return integer as
+create or replace procedure im_cost_del (
+	p_cost_id integer
+) as
 begin
     im_cost.del(p_cost_id);
-    return 0;
 end;
 /
 show errors;

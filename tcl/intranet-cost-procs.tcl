@@ -80,6 +80,25 @@ namespace eval im_cost {
 	if {0 == $cost_id} { set cost_id [db_nextval acs_object_id_seq]}
 	if {0 == $cost_status_id} { set cost_status_id [im_cost_status_created]}
 
+	set user_id [ad_get_user_id]
+	set creation_ip [ad_conn peeraddr]
+	set object_type "im_cost"
+	set today [db_string today "select sysdate from dual"]
+	if [catch {
+	    db_dml insert_costs "
+		insert into acs_objects	(
+			object_id, object_type, context_id,
+			creation_date, creation_user, creation_ip
+		) values (
+			:cost_id, :object_type, null,
+			:today, :user_id, :creation_ip
+	    )" 
+	} errmsg] {
+	    ad_return_complaint 1 "<li>Error saving employee cost information:<br>
+            <pre>$errmsg</pre>"
+	    return
+	}
+
 	if [catch {
 	    db_dml insert_costs "
 	insert into im_costs (
