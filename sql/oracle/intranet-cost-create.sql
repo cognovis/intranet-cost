@@ -500,6 +500,11 @@ create table im_costs (
 	cost_name		varchar(400)
 				constraint im_costs_name_nn
 				not null,
+	-- Nr is a current number to provide a unique 
+	-- identifier of a cost item for backup/restore.
+	cost_nr			varchar(400)
+				constraint im_costs_nr_nn
+				not null,
 	project_id		integer
 				constraint im_costs_project_fk
 				references im_projects,
@@ -590,6 +595,10 @@ create table im_costs (
 );
 create index im_costs_cause_object_idx on im_costs(cause_object_id);
 create index im_costs_start_block_idx on im_costs(start_block);
+
+-- Make sure that cost_nr is unique (atleast within a start_block)
+alter table im_costs add constraint im_costs_nr_un unique(start_block, cost_nr);
+
 
 
 -------------------------------------------------------------
@@ -693,8 +702,8 @@ is
 	);
 
 	insert into im_costs (
-		cost_id, cost_name, project_id, 
-		customer_id, provider_id, 
+		cost_id, cost_name, cost_nr, 
+		project_id, customer_id, provider_id, 
 		cost_status_id, cost_type_id,
 		template_id, investment_id,
 		effective_date, payment_days,
@@ -704,8 +713,8 @@ is
 		planning_p, planning_type_id, 
 		description, note
 	) values (
-		v_cost_cost_id, new.cost_name, new.project_id, 
-		new.customer_id, new.provider_id, 
+		v_cost_cost_id, new.cost_name, v_cost_cost_id, 
+		new.project_id, new.customer_id, new.provider_id, 
 		new.cost_status_id, new.cost_type_id,
 		new.template_id, new.investment_id,
 		new.effective_date, new.payment_days,
@@ -1311,3 +1320,11 @@ begin
 end;
 /
 commit;
+
+
+-------------------------------------------------------------
+-- Import backup reports
+--
+
+@intranet-cost-backup.sql
+
