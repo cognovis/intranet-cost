@@ -66,10 +66,10 @@ create table im_cost_centers (
 	name			varchar(100) not null,
 	cost_center_type_id	integer not null
 				constraint im_cost_centers_type_fk
-				references categories,
+				references im_categories,
 	cost_center_status_id	integer not null
 				constraint im_cost_centers_status_fk
-				references categories,
+				references im_categories,
 				-- Where to report costs?
 				-- The toplevel_center has parent_id=null.
 	parent_id		integer 
@@ -312,27 +312,27 @@ show errors
 -- The amortized amount of costs is calculated by summing up
 -- all im_cost_items with the specific investment_id
 --
-create table im_cost_investments (
-	investment_id		integer
-				constraint
-				primary key,
+create table im_cost_assets (
+	asset_id		integer
+				constraint im_cost_assets_pk
+				primary key
+				constraint im_cost_assets_id_fk
+				references acs_objects,
 	name			varchar(400),
-	investment_status_id	integer,
-				constraint im_cost_inv_status_fk
+	asset_status_id		integer
+				constraint im_cost_assets_status_fk
 				references im_categories,
-	investment_type_id	integer
-				constraint im_cost_inv_type_fk
+	asset_type_id		integer
+				constraint im_cost_assets_type_fk
 				references im_categories,
 	amount			number(12,3),
-	currency		char(3),
-				constraint im_cost_inv_currency_fk
-				references currencies
+	currency		char(3)
+				constraint im_cost_assets_currency_fk
+				references currency_codes(iso),
 	amort_start_date	date,
-	amort_interval_id	integer
-				constraint
-				references im_categories
-	amortization_period
-	description		varchar(4000),
+	-- amortize over how many months?
+	amort_period_months	integer,
+	description		varchar(4000)
 );
 
 
@@ -341,94 +341,94 @@ create table im_cost_investments (
 -- 3000-3099    Intranet Cost Center Type
 -- 3100-3199    Intranet Cost Center Status
 -- 3200-3399	reserved for cost centers
--- 3400-3499	Intranet Cost Investment Type
--- 3500-3599	Intranet Cost Investment Status
--- 3600-3699	Intranet Cost Investment Amortization Interval
+-- 3400-3499	Intranet Cost Asset Type
+-- 3500-3599	Intranet Cost Asset Status
+-- 3600-3699	Intranet Cost Asset Amortization Interval
 
--- Intranet Cost Investment Type
+-- Intranet Cost Asset Type
 delete from im_categories where category_id >= 3400 and category_id < 3500;
-INSERT INTO im_categories VALUES (3401,'Other','','Intranet Cost Investment Type',1,'f','');
-INSERT INTO im_categories VALUES (3402,'Computer Hardware','','Intranet Cost Investment Type',1,'f','');
-INSERT INTO im_categories VALUES (3403,'Computer Software','','Intranet Cost Investment Type',1,'f','');
-INSERT INTO im_categories VALUES (3404,'Office Furniture','','Intranet Cost Investment Type',1,'f','');
+INSERT INTO im_categories VALUES (3401,'Other','','Intranet Cost Asset Type',1,'f','');
+INSERT INTO im_categories VALUES (3402,'Computer Hardware','','Intranet Cost Asset Type',1,'f','');
+INSERT INTO im_categories VALUES (3403,'Computer Software','','Intranet Cost Asset Type',1,'f','');
+INSERT INTO im_categories VALUES (3404,'Office Furniture','','Intranet Cost Asset Type',1,'f','');
 commit;
 -- reserved until 3499
 
--- Intranet Cost Investment Status
+-- Intranet Cost Asset Status
 delete from im_categories where category_id >= 3500 and category_id < 3600;
-INSERT INTO im_categories VALUES (3501,'Active','','Intranet Cost Investment Status',1,'f','Currently being amortized');
-INSERT INTO im_categories VALUES (3502,'Deleted','','Intranet Cost Investment Status',1,'f','Deleted - was an error');
-INSERT INTO im_categories VALUES (3503,'Amortized','','Intranet Cost Investment Status',1,'f','Finished amortization - no remaining book value');
+INSERT INTO im_categories VALUES (3501,'Active','','Intranet Cost Asset Status',1,'f','Currently being amortized');
+INSERT INTO im_categories VALUES (3502,'Deleted','','Intranet Cost Asset Status',1,'f','Deleted - was an error');
+INSERT INTO im_categories VALUES (3503,'Amortized','','Intranet Cost Asset Status',1,'f','Finished amortization - no remaining book value');
 commit;
 -- reserved until 3599
 
--- Intranet Cost Investment Amortization Internval
+-- Intranet Cost Asset Amortization Internval
 delete from im_categories where category_id >= 3600 and category_id < 3700;
-INSERT INTO im_categories VALUES (3601,'Month','','Intranet Cost Investment Amortization Internval',1,'f','Currently being amortized');
-INSERT INTO im_categories VALUES (3602,'Quarter','','Intranet Cost Investment Amortization Internval',1,'f','Currently being amortized');
-INSERT INTO im_categories VALUES (3603,'Year','','Intranet Cost Investment Amortization Internval',1,'f','Currently being amortized');
+INSERT INTO im_categories VALUES (3601,'Month','','Intranet Cost Asset Amortization Internval',1,'f','Currently being amortized');
+INSERT INTO im_categories VALUES (3602,'Quarter','','Intranet Cost Asset Amortization Internval',1,'f','Currently being amortized');
+INSERT INTO im_categories VALUES (3603,'Year','','Intranet Cost Asset Amortization Internval',1,'f','Currently being amortized');
 commit;
 -- reserved until 3699
 
 
 
 -------------------------------------------------------------
--- Cost Items
+-- Costs
 --
--- Cost items are possibly assigned to project, customers and/or investments,
--- whereever this is reasonable.
--- The idea is to be able to come up with profit/loss on a per-project base
--- as well as on a per-customer base.
--- Amortization items are additionally related to an investment, so that we
--- can track the amortized money
+-- Costs is the superclass for all financial items such as 
+-- Invoices, Quotes, Purchase Orders, Bills (from providers), 
+-- Travel Costs, Payroll Costs, Fixed Costs, Amortization Costs,
+-- etc. in order to allow for simple SQL queries revealing the
+-- financial status of a company.
 --
-create table im_cost_items (
-	item_id			integer
-				constraint im_cost_items_pk
+-- Costs are also used for controlling, namely by assigning costs
+-- to projects, customers and cost centers in order to allow for 
+-- (more or less) accurate profit & loss calculation.
+-- This assignment sometimes requires to split a large cost item
+-- into several smaller items in order to assign them more 
+-- accurately to project, customers or cost centers ("redistribution").
+--
+create table im_costs (
+	cost_id			integer
+				constraint im_costs_pk
 				primary key,
+				constraint im_costs_item_fk
+				references acs_objects,
 	name			varchar(400),
+	cost_status_id		integer
+				constraint im_costs_status_fk
+				references im_categories,
+	cost_type_id		integer
+				constraint im_costs_type_fk
+				references im_categories,
 	project_id		integer
-				constraint im_cost_items_project_fk
+				constraint im_costs_project_fk
 				references im_projects,
 	customer_id		integer
-				constraint im_cost_items_customer_nn
-				not null
-				constraint im_cost_items_customer_fk
+				constraint im_costs_customer_fk
 				references im_customers,
-	investment_id		integer
-				constraint
-				references im_investments,
-	creation_date		date,
-	creator_id		integer
-				constraint im_cost_itmes_creator_fk
-				references parties,
-	input_date		date,
+	asset_id		integer
+				constraint im_costs_asset_fk
+				references im_assets,
 	due_date		date,
 	payment_date		date,
-	payment_id		integer
-				constraint im_cost_items_payment_fk
-				references im_payments,
 	amount			number(12,3),
-	currency		char(3) references currencies,
-	-- Classification of variable against fixed costs
-	variable_cost_p		char(1)
-				constraint im_cost_items_var_ck
-				check variable_cost_p in ('t','f'),
-	needs_redistribution_p	char(1)
-				constraint im_cost_items_var_ck
-				check needs_redistribution_p in ('t','f'),
-	-- Points to its parent if the parent was distributed
-	parent_id		integer
-				constraint im_cost_items_parent_fk
-				references im_cost_items,
-	-- Indicates that this cost item has been redistributed to
-	-- potentially several other items, so we don't want to
-	-- include such items in sums.
+	currency		char(3) references currency_codes(iso),
+	-- variable or fixed costs?
+	variable_type_id	integer
+				constraint im_cost_variable_fk
+				references im_categories,
+	-- cost has been split into several small cost items?
 	redistributed_p		char(1)
-				constraint im_cost_items_var_ck
+				constraint im_costs_var_ck
 				check redistributed_p in ('t','f'),
-	planning_p		char(1)
-				constraint im_cost_items_var_ck
-				check planning_p in ('t','f'),
+	-- points to its parent if the parent was "distributed"
+	parent_cost_id		integer
+				constraint im_costs_parent_fk
+				references im_costs,
+	-- "real cost", "planning" of "quote or purchase order"
+	planning_type_id	integer
+				constraint im_costs_planning_type_fk
+				references im_categories,
 	description		varchar(4000),
 );
