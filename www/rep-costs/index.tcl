@@ -35,6 +35,11 @@ set site_url "/intranet-cost/rep-costs"
 set cost_url "/intranet-cost/costs/new"
 set cost_create_url "/intranet-cost/rep-costs/new-rep-cost"
 
+if {![im_permission $user_id view_costs]} {
+    ad_return_complaint 1 "<li>You have insufficiente privileges to view this page"
+    return
+}
+
 # Start with January of this year if not otherwise specified:
 if {"" == $start_date} {
     set start_date [db_string get_current_year "select to_char(sysdate, 'YYYY') from dual"]
@@ -54,10 +59,22 @@ if {"" == $start_month || $start_month < 1 || $start_month > 12} {
 # ---------------------------------------------------------------
 
 # Get the list of repeating cost_ids
-set repeating_costs_sql "select * from im_repeating_costs"
+set repeating_costs_sql "
+select 
+	rc.rep_cost_id,
+	rc.start_date,
+	rc.end_date,
+	ci.cost_name
+from
+	im_repeating_costs rc,
+	im_costs ci
+where
+	ci.cost_id = rc.rep_cost_id
+"
+
 set repeating_cost_ids [list]
 db_foreach repeating_costs $repeating_costs_sql {
-    lappend repeating_cost_ids [list $cost_id $cost_name]
+    lappend repeating_cost_ids [list $rep_cost_id $cost_name]
 }
 
 
@@ -65,7 +82,7 @@ db_foreach repeating_costs $repeating_costs_sql {
 # days of each month) during the lifetime of all
 # "repeating cost items".
 set all_start_blocks_sql "
-select	rc.cost_id as rep_cost_id,
+select	rc.rep_cost_id,
         sm.start_block
 from	im_repeating_costs rc,
         im_start_months sm
@@ -128,7 +145,7 @@ foreach cost_tuple $repeating_cost_ids {
     set cost_name [lindex $cost_tuple 1]
 
     append table_body_html "<tr $bgcolor([expr $ctr % 2])>\n"
-    append table_body_html "<td><a href=asdf>$cost_name</a></td>\n"
+    append table_body_html "<td><a href=new?rep_cost_id=$rep_cost_id&form_mode=display>$cost_name</a></td>\n"
 
     for {set month 1} {$month <= $report_months} {incr month} {
 
