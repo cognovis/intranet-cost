@@ -1,4 +1,4 @@
-# /packages/intranet-costs/www/cost-action.tcl
+# /packages/intranet-costs/www/costs/cost-action.tcl
 #
 # Copyright (C) 2003-2004 Project/Open
 #
@@ -53,10 +53,10 @@ switch $submit {
 	foreach cost_id $del_cost {
 	    set otype $object_type($cost_id)
 	    # ToDo: Security
-	    db_dml delete_cost_item "
-		begin
-			${otype}.del(:cost_id);
-		end;"
+#	    db_0or1row delete_cost_item "select ${otype}.del(:cost_id) from dual"
+
+	    im_exec_dml del_cost_item "${otype}_del(:cost_id)"
+
 	    lappend in_clause_list $cost_id
 	}
 	set cost_where_list "([join $in_clause_list ","])"

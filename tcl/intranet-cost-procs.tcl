@@ -33,7 +33,9 @@ ad_proc -public im_cost_type_bill {} { return 3704 }
 ad_proc -public im_cost_type_po {} { return 3706 }
 ad_proc -public im_cost_type_customer_doc {} { return 3708 }
 ad_proc -public im_cost_type_provider_doc {} { return 3710 }
-
+ad_proc -public im_cost_type_provider_travel {} { return 3712 }
+ad_proc -public im_cost_type_employee {} { return 3714 }
+ad_proc -public im_cost_type_repeating {} { return 3716 }
 
 # Payment Methods
 ad_proc -public im_payment_method_undefined {} { return 800 }
@@ -53,6 +55,56 @@ ad_proc -private im_package_cost_id_helper {} {
 }
 
 
+# ---------------------------------------------------------------
+# Cost Item Creation
+# ---------------------------------------------------------------
+
+namespace eval im_cost {
+
+    ad_proc -public new { 
+	{-cost_id 0}
+	{-cost_status_id 0}
+	{-customer_id 0}
+	{-provider_id 0}
+	-cost_name
+	-cost_type_id
+    } {
+	Create a new cost item and return its ID.
+	The cost item is created with the minimum number
+	of parameters necessary for creation (not null).
+	We asume that an UPDATE is executed afterwards
+	in order to fill in more details.
+    } {
+	if {0 == $customer_id} { set customer_id [im_customer_internal] }
+	if {0 == $provider_id} { set provider_id [im_customer_internal] }
+	if {0 == $cost_id} { set cost_id [db_nextval acs_object_id_seq]}
+	if {0 == $cost_status_id} { set cost_status_id [im_cost_status_created]}
+
+	if [catch {
+	    db_dml insert_costs "
+	insert into im_costs (
+		cost_id,
+		cost_name,
+		customer_id,
+		provider_id,
+		cost_type_id,
+		cost_status_id
+	) values (
+		:cost_id,
+		:cost_name,
+		:customer_id,
+		:provider_id,
+		:cost_type_id,
+		:cost_status_id
+	)" } errmsg] {
+	    ad_return_complaint 1 "<li>Error saving employee cost information:<br>
+            <pre>$errmsg</pre>"
+	    return
+	}
+	return $cost_id
+    }
+    
+}
 
 
 # ---------------------------------------------------------------

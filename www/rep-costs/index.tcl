@@ -54,7 +54,18 @@ if {"" == $start_month || $start_month < 1 || $start_month > 12} {
 # ---------------------------------------------------------------
 
 # Get the list of repeating cost_ids
-set repeating_costs_sql "select * from im_repeating_costs"
+set repeating_costs_sql "
+select 
+	rc.start_date,
+	rc.end_date,
+	ci.*
+from
+	im_repeating_costs rc,
+	im_costs ci
+where
+	ci.cost_id = rc.cost_id
+"
+
 set repeating_cost_ids [list]
 db_foreach repeating_costs $repeating_costs_sql {
     lappend repeating_cost_ids [list $cost_id $cost_name]
@@ -128,7 +139,7 @@ foreach cost_tuple $repeating_cost_ids {
     set cost_name [lindex $cost_tuple 1]
 
     append table_body_html "<tr $bgcolor([expr $ctr % 2])>\n"
-    append table_body_html "<td><a href=asdf>$cost_name</a></td>\n"
+    append table_body_html "<td><a href=new?cost_id=$cost_id&form_mode=display>$cost_name</a></td>\n"
 
     for {set month 1} {$month <= $report_months} {incr month} {
 
