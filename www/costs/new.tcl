@@ -36,6 +36,13 @@ if {![im_permission $user_id view_costs]} {
 set action_url "/intranet-cost/costs/new"
 set focus "cost.var_name"
 
+set admin_html "
+<ul>
+  <li><A href=''>Distribute costs according to timesheet information</a>
+  <li><A href=''>!!!</a>
+</ul>
+"
+
 # ------------------------------------------------------------------
 # Get everything about the cost
 # ------------------------------------------------------------------

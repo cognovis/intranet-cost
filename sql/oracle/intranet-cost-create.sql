@@ -1194,7 +1194,7 @@ begin
 
     v_menu := im_menu.new (
         package_name => 'intranet-cost',
-        label =>        'costs-rep',
+        label =>        'costs_rep',
         name =>         'Repeating Costs',
         url =>          '/intranet-cost/rep-costs/',
         sort_order =>   90,
