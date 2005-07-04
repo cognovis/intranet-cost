@@ -96,6 +96,22 @@ ad_proc -public im_cost_uom_options { {include_empty 1} } {
 }
 
 
+
+# ---------------------------------------------------------------
+# Auxil
+# ---------------------------------------------------------------
+
+ad_proc -public n20 { value } { 
+    Converts null ("") values to numeric "0". This function
+    is used inside view definitions in order to deal with null
+    values in TCL 
+} {
+    if {"" == $value} { set value 0 }
+    return $value
+}
+
+
+
 # ---------------------------------------------------------------
 # Cost Item Creation
 # ---------------------------------------------------------------
