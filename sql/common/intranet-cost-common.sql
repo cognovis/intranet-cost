@@ -253,3 +253,50 @@ sort_order) values (22098,220,'Del',
 <input type=checkbox name=del_cost value=$cost_id>"',99);
 -- commit;
 
+
+---------------------------------------------------------
+-- Project Status List
+-- The "view_id = 21" entry has already been added in intranet_views.sql
+--
+delete from im_view_columns where column_id > 2100 and column_id < 2199;
+--
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (2101,21,NULL,'Project Nr',
+'"<A HREF=/intranet/projects/view?project_id=$project_id>$project_nr</A>"',
+'','',1,'');
+
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (2102,21,NULL,'Name',
+'"<A HREF=/intranet/projects/view?project_id=$project_id>$project_name</A>"',
+'','',2,'');
+
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (2103,21,NULL,'Client',
+'"<A HREF=/intranet/companies/view?company_id=$company_id>$company_name</A>"',
+'','',3,'im_permission $user_id view_companies');
+
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (2105,21,NULL,'Type',
+'$project_type','','',5,'');
+
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (2107,21,NULL,'Status',
+'$project_status','','',7,'');
+
+
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (2121,21,NULL,'Invoices',
+'$cost_invoices_cache','','',21,'');
+
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (2123,21,NULL,'Bills',
+'$cost_bills_cache','','',23,'');
+
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (2125,21,NULL,'Time sheet',
+'$cost_timesheet_logged_cache','','',25,'');
+
+insert into im_view_columns (column_id, view_id, group_id, column_name, column_render_tcl,
+extra_select, extra_where, sort_order, visible_for) values (2127,21,NULL,'Profit',
+'[expr $cost_invoices_cache - $cost_bills_cache - $cost_timesheet_logged_cache]','','',27,'');
+
