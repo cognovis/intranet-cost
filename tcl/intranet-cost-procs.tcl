@@ -1094,6 +1094,7 @@ order by
     
     # Add some links to create new financial documents
     # if the intranet-invoices module is installed
+    set admin_html ""
     if {[db_table_exists im_invoices]} {
 
 	set admin_html "
@@ -1122,9 +1123,18 @@ order by
 	</tr>
         </table>
 	"
+    }
 
-	set cost_html "
+    # Print out a warning in case of multiple currencies,
+    # because we can't include this project then in profit & loss
+    # and margin calculations
+    set multiple_currency_warning ""
+    if {1 < $num_currencies} { 
+	set multiple_currency_warning [_ intranet-cost.Multiple_Currency_Warning]  
+    }
 
+    set cost_html "
+$multiple_currency_warning
 <table>
 <tr valign=top>
   <td>
@@ -1150,10 +1160,8 @@ order by
 </tr>
 </table>
 "
-    }
 
     return $cost_html
-
 }
 
 
