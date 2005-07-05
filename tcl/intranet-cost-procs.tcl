@@ -725,20 +725,20 @@ from
 			ci.cost_id in (
 		                select distinct cost_id
 		                from im_costs
-		                where project_id=:project_id
+		                where project_id = :org_project_id
 			    UNION
 				select distinct cost_id 
 				from im_costs 
-				where parent_id = :project_id
+				where parent_id = :org_project_id
 		            UNION
 		                select distinct object_id_two as cost_id
 		                from acs_rels
-		                where object_id_one = :project_id
+		                where object_id_one = :org_project_id
 			    UNION
 				select distinct object_id_two as cost_id
 				from acs_rels r, im_projects p
 				where object_id_one = p.project_id
-				      and p.parent_id = :project_id
+				      and p.parent_id = :org_project_id
 			)
 	) ci on (cat.category_id = ci.cost_type_id)
 where
@@ -823,20 +823,20 @@ where
 	and ci.cost_id in (
 		select distinct cost_id 
 		from im_costs 
-		where project_id = :project_id
+		where project_id = :org_project_id
 	    UNION
 		select distinct cost_id 
 		from im_costs 
-		where parent_id = :project_id
+		where parent_id = :org_project_id
 	    UNION
 		select distinct object_id_two as cost_id
 		from acs_rels
-		where object_id_one = :project_id
+		where object_id_one = :org_project_id
 	    UNION
 		select distinct object_id_two as cost_id
 		from acs_rels r, im_projects p
 		where object_id_one = p.project_id
-		      and p.parent_id = :project_id
+		      and p.parent_id = :org_project_id
 	)
 order by
 	p.project_nr,
@@ -977,7 +977,7 @@ order by
 			cost_purchase_orders_cache = $subtotals([im_cost_type_po]$currency),
 			cost_timesheet_planned_cache = 0
 		where
-			project_id = :project_id
+			project_id = :org_project_id
             "
 	} else {
 
@@ -993,7 +993,7 @@ order by
 			cost_purchase_orders_cache = null,
 			cost_timesheet_planned_cache = null
 		where
-			project_id = :project_id
+			project_id = :org_project_id
             "
 	}
     }
@@ -1107,7 +1107,7 @@ order by
 	  <td colspan=$colspan>\n"
 
 	    # Customer invoices: customer = Project Customer, provider = Internal
-	    set customer_id [db_string project_customer "select company_id from im_projects where project_id=:project_id" -default ""]
+	    set customer_id [db_string project_customer "select company_id from im_projects where project_id = :org_project_id" -default ""]
 	    set provider_id [im_company_internal]
 	    set bind_vars [ad_tcl_vars_to_ns_set customer_id provider_id project_id]
       	    append admin_html [im_menu_ul_list "invoices_customers" $bind_vars]
