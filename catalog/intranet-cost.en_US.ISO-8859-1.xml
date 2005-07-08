@@ -44,6 +44,12 @@
     find and enter all information about companies, projects
     and users.</msg>
   <msg key="more_costs">more costs...</msg>
+  <msg key="Multiple_Currency_Warning">&lt;h2&gt;Multiple Currency Warning&lt;/h2&gt;
+&lt;p&gt;
+This project includes financial documents with more then one currency.
+&lt;br&gt;
+While this is OK in general, it will keep us from calculating a single profit&amp;loss number for this project and to include this project in the project margin calculation.
+&lt;/p&gt;</msg>
   <msg key="Name">Name</msg>
   <msg key="New_Cost">New Cost</msg>
   <msg key="New_Cost_Item">New Cost Item</msg>
