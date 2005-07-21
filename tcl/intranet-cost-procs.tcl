@@ -693,6 +693,7 @@ ad_proc im_costs_project_finance_component { user_id project_id } {
     set bgcolor(1) " class=rowodd "
     set colspan 6
     set date_format "YYYY-MM-DD"
+    set num_format "9999999999.99"
 
     # Where to link when clicking on an object link? "edit" or "view"?
     set view_mode "view"
@@ -704,10 +705,13 @@ ad_proc im_costs_project_finance_component { user_id project_id } {
     set org_project_id $project_id
 
     # ----------------- Main SQL - select subtotals and their currencies -------------
+
+set ttt "to_char(sum(ci.amount), :num_format) as amount,"
+
     
     set subtotals_sql "
 select
-	sum(ci.amount) as amount,
+	to_char(sum(ci.amount), :num_format) as amount,
 	ci.currency,
         cat.category_id as cost_type_id,
         im_category_from_id(cat.category_id) as cost_type,
@@ -800,6 +804,7 @@ select
 	ci.*,
 	ci.paid_amount as payment_amount,
 	ci.paid_currency as payment_currency,
+	to_char(ci.amount, :num_format) as amount,
 	p.project_nr,
 	p.project_name,
 	cust.company_name as customer_name,
