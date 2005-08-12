@@ -38,8 +38,8 @@ set focus "cost.var_name"
 
 set admin_html "
 <ul>
-  <li><A href=''>[_ intranet-cost.lt_Distribute_costs_acco]</a>
-  <li><A href=''>!!!</a>
+<!--  <li><A href=''>[_ intranet-cost.lt_Distribute_costs_acco]</a> -->
+<!--  <li><A href=''>!!!</a> -->
 </ul>
 "
 
