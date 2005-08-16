@@ -14,6 +14,15 @@ ad_page_contract {
     { project_id 0 }
     { company_id 0 }
 }
+
+# Redirect directly to the "customer documents" page
+ad_returnredirect "/intranet-invoices/list?cost_type_id=3708"
+
+
+
+
+
+
 set user_id [ad_maybe_redirect_for_registration]
 set page_title "[_ intranet-cost.Finance_Home]"
 set context_bar [im_context_bar $page_title]
