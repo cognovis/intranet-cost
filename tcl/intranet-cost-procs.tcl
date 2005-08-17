@@ -1106,7 +1106,10 @@ order by
 	<table>
 	<tr>
 	  <td colspan=$colspan class=rowtitle align=center>
-	    [_ intranet-core.Admin_Links]
+
+<!--	    [_ intranet-core.Admin_Links] -->
+            New Financial Documents
+
 	  </td>
 	</tr>
 	<tr class=rowplain>
