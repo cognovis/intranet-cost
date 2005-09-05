@@ -57,6 +57,48 @@ ad_proc -private im_package_cost_id_helper {} {
 
 
 
+# -----------------------------------------------------------
+# Permissions
+# -----------------------------------------------------------
+
+ad_proc -public im_cost_permissions {user_id cost_id view_var read_var write_var admin_var} {
+    Fill the "by-reference" variables read, write and admin
+    with the permissions of $user_id on $cost_id.<br>
+    Basicly, cost permissions are derived from the permissions on the 
+    underlying company. However, external users (customer and
+    freelancer) can never get write permission on financial documents.
+} {
+    upvar $view_var view
+    upvar $read_var read
+    upvar $write_var write
+    upvar $admin_var admin
+
+    set view 0
+    set read 0
+    set write 0
+    set admin 0
+
+    set company_id [db_string get_company "select company_id from im_costs where cost_id = :cost_id" -default 0]
+    im_company_permissions $user_id $company_id view read write admin
+
+    if {[im_permission $user_id view_invoices]} {
+	set read 1
+	set view 1
+    }
+
+    # limit rights of non-employees to view & read
+    set user_is_employee_p [im_user_is_employee_p $user_id]
+    if {!$user_is_employee_p} {
+	set write 0
+	set admin 0
+    }
+}
+
+
+# -----------------------------------------------------------
+# Options & Selects
+# -----------------------------------------------------------
+
 ad_proc -public im_cost_center_status_options { {include_empty 1} } { 
     Cost Center status options
 } {
