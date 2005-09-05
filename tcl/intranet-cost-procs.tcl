@@ -64,9 +64,11 @@ ad_proc -private im_package_cost_id_helper {} {
 ad_proc -public im_cost_permissions {user_id cost_id view_var read_var write_var admin_var} {
     Fill the "by-reference" variables read, write and admin
     with the permissions of $user_id on $cost_id.<br>
+
     Basicly, cost permissions are derived from the permissions on the 
-    underlying company. However, external users (customer and
-    freelancer) can never get write permission on financial documents.
+    underlying companies. However, external users (customer and
+    freelancer) can never get write permission on cost items and financial
+    documents.
 } {
     upvar $view_var view
     upvar $read_var read
@@ -78,8 +80,27 @@ ad_proc -public im_cost_permissions {user_id cost_id view_var read_var write_var
     set write 0
     set admin 0
 
-    set company_id [db_string get_company "select company_id from im_costs where cost_id = :cost_id" -default 0]
-    im_company_permissions $user_id $company_id view read write admin
+    # determine customer & provider
+    set customer_id 0
+    set provider_id 0
+    db_0or1row get_companies "
+	select
+		customer_id,
+		provider_id
+	from 
+		im_costs 
+	where 
+		cost_id = :cost_id
+    "
+
+    im_company_permissions $user_id $customer_id cust_view cust_read cust_write cust_admin
+    im_company_permissions $user_id $provider_id prov_view prov_read prov_write prov_admin
+
+    # Set the permission as the OR-conjunction of provider and customer
+    set view [expr $cust_view || $prov_view]
+    set read [expr $cust_read || $prov_read]
+    set write [expr $cust_write || $prov_write]
+    set admin [expr $cust_admin || $prov_admin]
 
     if {[im_permission $user_id view_invoices]} {
 	set read 1
