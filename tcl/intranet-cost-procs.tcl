@@ -65,10 +65,13 @@ ad_proc -public im_cost_permissions {user_id cost_id view_var read_var write_var
     Fill the "by-reference" variables read, write and admin
     with the permissions of $user_id on $cost_id.<br>
 
-    Basicly, cost permissions are derived from the permissions on the 
-    underlying companies. However, external users (customer and
-    freelancer) can never get write permission on cost items and financial
-    documents.
+    Basicly cost permissions are derived from the permissions on the
+    underlying companies.
+    Via an "or-conjunction", a "view_costs" privilege give a user permission
+    to view all cost items.
+    An "add_costs" privilege allows the user to admin all cost items.
+    The lack of this "add_costs" privilege will also erase any possibility
+    to create/write/edit/admin any cost items.
 } {
     upvar $view_var view
     upvar $read_var read
@@ -84,17 +87,32 @@ ad_proc -public im_cost_permissions {user_id cost_id view_var read_var write_var
     set customer_id 0
     set provider_id 0
     db_0or1row get_companies "
-	select
-		customer_id,
-		provider_id
-	from 
-		im_costs 
-	where 
-		cost_id = :cost_id
+        select
+                customer_id,
+                provider_id
+        from
+                im_costs
+        where
+                cost_id = :cost_id
     "
 
-    im_company_permissions $user_id $customer_id cust_view cust_read cust_write cust_admin
-    im_company_permissions $user_id $provider_id prov_view prov_read prov_write prov_admin
+    set cust_view 0
+    set cust_read 0
+    set cust_write 0
+    set cust_admin 0
+    if {$customer_id} {
+        im_company_permissions $user_id $customer_id cust_view cust_read cust_write cust_admin
+    }
+
+
+    set prov_view 0
+    set prov_read 0
+    set prov_write 0
+    set prov_admin 0
+    if {$provider_id} {
+        im_company_permissions $user_id $provider_id prov_view prov_read prov_write prov_admin
+    }
+
 
     # Set the permission as the OR-conjunction of provider and customer
     set view [expr $cust_view || $prov_view]
@@ -103,18 +121,32 @@ ad_proc -public im_cost_permissions {user_id cost_id view_var read_var write_var
     set admin [expr $cust_admin || $prov_admin]
 
     if {[im_permission $user_id view_invoices]} {
-	set read 1
-	set view 1
+        set read 1
+        set view 1
     }
 
-    # limit rights of non-employees to view & read
-    set user_is_employee_p [im_user_is_employee_p $user_id]
-    if {!$user_is_employee_p} {
-	set write 0
-	set admin 0
+    set can_read [expr [im_permission $user_id view_costs] || [im_permission $user_id view_invoices]]
+    set can_admin [expr [im_permission $user_id add_costs] || [im_permission $user_id add_invoices]]
+
+    if {$can_read} {
+        set read 1
+        set view 1
+    }
+
+    if {$can_admin} {
+        set admin 1
+        set write 1
+        set read 1
+        set view 1
+    }
+
+    # Limit rights of all users to view & read if they dont
+    # have the expressive permission to "add_costs or add_invoices".
+    if {!$can_admin} {
+        set write 0
+        set admin 0
     }
 }
-
 
 # -----------------------------------------------------------
 # Options & Selects
