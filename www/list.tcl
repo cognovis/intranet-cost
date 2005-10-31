@@ -165,7 +165,7 @@ if {$provider_id} {
 if {$company_id} {
     lappend criteria "(c.provider_id = :company_id OR c.customer_id = :company_id)"
 }
-if {$project_id} {
+if {"" != $project_id && 0 != $project_id} {
     lappend criteria "c.cost_id in (
 	select distinct cost_id
 	from im_costs
