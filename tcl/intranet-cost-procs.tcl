@@ -703,7 +703,7 @@ order by
 	append cost_html "
 <tr$bgcolor([expr $ctr % 2])>
   <td colspan=$colspan>
-    <A HREF=/intranet-cost/index?status_id=0&[export_url_vars status_id company_id project_id]>
+    <A HREF=/intranet-cost/list?[export_url_vars status_id company_id project_id]>
       [_ intranet-cost.more_costs]
     </A>
   </td>
