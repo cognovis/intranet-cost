@@ -257,7 +257,7 @@ sort_order) values (22098,220,'Del',
 
 
 ---------------------------------------------------------
--- Project Status List
+-- Project Profit & Loss List
 -- The "view_id = 21" entry has already been added in intranet_views.sql
 --
 delete from im_view_columns where column_id > 2100 and column_id < 2199;
