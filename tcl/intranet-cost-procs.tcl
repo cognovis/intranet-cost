@@ -763,7 +763,12 @@ order by
 # Benefits & Loss Calculation per Project
 # ---------------------------------------------------------------
 
-ad_proc im_costs_project_finance_component { user_id project_id } {
+ad_proc im_costs_project_finance_component { 
+    {-show_details_p 1}
+    {-show_summary_p 1}
+    user_id 
+    project_id 
+} {
     Returns a HTML table containing a detailed summary of all
     financial activities of the project. <p>
 
@@ -1056,7 +1061,6 @@ order by
     # Close the main table
     append cost_html "</table>\n"
 
-
     # ----------------- Hard Costs HTML -------------
     # Hard "real" costs such as invoices, bills and timesheet
 
@@ -1114,9 +1118,9 @@ order by
     }
 
     set hard_cost_html "
-<table>
+<table width=\"100%\">
   <tr class=rowtitle>
-    <td class=rowtitle colspan=99 align=center>[_ intranet-cost.Real_Costs]</td>
+    <td class=rowtitle colspan=2 align=center>[_ intranet-cost.Real_Costs]</td>
     $currency_subheaders
   </tr>
   <tr>
@@ -1149,9 +1153,9 @@ order by
     # Preliminary (planned) Costs such as Quotes and Purchase Orders
 
     set prelim_cost_html "
-<table>
+<table width=\"100%\">
   <tr class=rowtitle>
-    <td class=rowtitle colspan=99 align=center>[_ intranet-cost.Preliminary_Costs]</td>
+    <td class=rowtitle colspan=2 align=center>[_ intranet-cost.Preliminary_Costs]</td>
     $currency_subheaders
   </tr>
   <tr>
@@ -1168,16 +1172,11 @@ order by
 	set grand_total($currency) [expr $grand_total($currency) - $subtotal]
     }
 
-# No planned timesheet yet - will be from resource planning
-#    append prelim_cost_html "</tr>\n<tr>\n<td>[_ intranet-cost.Timesheet_Costs]</td>\n"
-#    foreach currency $currencies {
-#	append prelim_cost_html "<td align=right>
-#	  $subtotals([im_cost_type_timesheet]$currency) $currency
-#	</td>\n"
-#    }
-    append prelim_cost_html "</tr>\n<tr>\n<td></td>\n"
+    append prelim_cost_html "</tr>\n<tr>\n<td>[_ intranet-cost.Timesheet_Costs]</td>\n"
     foreach currency $currencies {
-	append prelim_cost_html "<td align=right>&nbsp;</td>\n"
+	append prelim_cost_html "<td align=right>
+<!--	  $subtotals([im_cost_type_timesheet]$currency) $currency -->
+	</td>\n"
     }
 
     append prelim_cost_html "</tr>\n<tr>\n<td><b>[_ intranet-cost.Grand_Total]</b></td>\n"
@@ -1233,35 +1232,65 @@ order by
 	set multiple_currency_warning [_ intranet-cost.Multiple_Currency_Warning]  
     }
 
-    set cost_html "
-$multiple_currency_warning
-<table>
-<tr valign=top>
-  <td>
-    $cost_html
-  </td>
-  <td>
-    $admin_html
-  </td>
-</tr>
-</table>
-<br>
+    set result_html ""
 
-<table cellspacing=0 cellpadding=0>
-<tr><td class=rowtitle colspan=99 align=center>Summary</td></tr>
-<tr valign=top>
-  <td>
-    $hard_cost_html
-  </td>
-  <td>&nbsp &nbsp;</td>
-  <td>
-    $prelim_cost_html
-  </td>
-</tr>
-</table>
-"
+    if {$show_details_p} {
+	set result_html "
+	$multiple_currency_warning
+	<table>
+	<tr valign=top>
+	  <td>
+	    $cost_html
+	  </td>
+	  <td>
+	    $admin_html
+	  </td>
+	</tr>
+	</table>\n"
 
-    return $cost_html
+    }
+
+    if {$show_details_p && $show_summary_p} {
+	# Summary in broad format
+        append result_html "
+	<br>
+	<table cellspacing=0 cellpadding=0>
+	<tr><td class=rowtitle colspan=3 align=center>[_ intranet-cost.Financial_Summary]</td></tr>
+	<tr valign=top>
+	  <td>
+	    $hard_cost_html
+	  </td>
+	  <td>&nbsp &nbsp;</td>
+	  <td>
+	    $prelim_cost_html
+	  </td>
+	</tr>
+	</table>
+	"
+    }
+
+    if {!$show_details_p && $show_summary_p} {
+	# Summary in narrow format
+        append result_html "
+	<br>
+	<table cellspacing=0 cellpadding=0 width=\"70%\" >
+	<tr>
+	  <td class=rowtitle align=center>[_ intranet-cost.Financial_Summary]</td>
+	</tr>
+	<tr valign=top>
+	  <td>
+	    $hard_cost_html
+	  </td>
+	</tr>
+	<tr>
+	  <td>
+	    $prelim_cost_html
+	  </td>
+	</tr>
+	</table>
+	"
+    }
+    return $result_html
 }
 
 
