@@ -649,7 +649,7 @@ select
 	url.url,
         im_category_from_id(ci.cost_status_id) as cost_status,
         im_category_from_id(ci.cost_type_id) as cost_type,
-	to_date(to_char(ci.effective_date,'yyyymmdd'),'yyyymmdd') + payment_days as calculated_due_date
+	to_date(to_char(ci.effective_date,'yyyymmdd'),'yyyymmdd') + ci.payment_days as calculated_due_date
 	$extra_select_clause
 from
 	im_costs ci,
@@ -912,7 +912,7 @@ select
 	url.url,
         im_category_from_id(ci.cost_status_id) as cost_status,
         im_category_from_id(ci.cost_type_id) as cost_type,
-	to_date(to_char(ci.effective_date,:date_format),:date_format) + payment_days as calculated_due_date
+	to_date(to_char(ci.effective_date,:date_format),:date_format) + ci.payment_days as calculated_due_date
 from
 	im_costs ci
 		LEFT OUTER JOIN im_projects p ON ci.project_id = p.project_id,
