@@ -1120,7 +1120,7 @@ order by
     set hard_cost_html "
 <table width=\"100%\">
   <tr class=rowtitle>
-    <td class=rowtitle colspan=2 align=center>[_ intranet-cost.Real_Costs]</td>
+    <td class=rowtitle colspan=9 align=center>[_ intranet-cost.Real_Costs]</td>
     $currency_subheaders
   </tr>
   <tr>
@@ -1155,7 +1155,7 @@ order by
     set prelim_cost_html "
 <table width=\"100%\">
   <tr class=rowtitle>
-    <td class=rowtitle colspan=2 align=center>[_ intranet-cost.Preliminary_Costs]</td>
+    <td class=rowtitle colspan=9 align=center>[_ intranet-cost.Preliminary_Costs]</td>
     $currency_subheaders
   </tr>
   <tr>
