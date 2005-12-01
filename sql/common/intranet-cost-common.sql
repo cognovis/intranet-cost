@@ -120,6 +120,10 @@ INSERT INTO im_categories VALUES (900,'invoice.en.adp','','Intranet Cost Templat
 INSERT INTO im_categories VALUES (902,'invoice.es.adp','','Intranet Cost Template','category','t','f');
 INSERT INTO im_categories VALUES (904,'quote.en.adp','','Intranet Cost Template','category','t','f');
 INSERT INTO im_categories VALUES (906,'quote.es.adp','','Intranet Cost Template','category','t','f');
+INSERT INTO im_categories VALUES (908,'po.en.adp','','Intranet Cost Template','category','t','f');
+INSERT INTO im_categories VALUES (910,'po.es.adp','','Intranet Cost Template','category','t','f');
+
+
 -- reserved until 999
 
 
