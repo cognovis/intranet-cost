@@ -82,6 +82,10 @@ if { [empty_string_p $how_many] || $how_many < 1 } {
 }
 set end_idx [expr $start_idx + $how_many - 1]
 
+if {0 != $project_id && "" != $project_id} {
+    set company_id [db_string company_from_project "select company_id from im_projects where project_id = :project_id" -default 0]
+}
+
 
 # ---------------------------------------------------------------
 # 3. Defined Table Fields
