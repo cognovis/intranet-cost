@@ -78,10 +78,8 @@ ad_proc -public im_cost_permissions {user_id cost_id view_var read_var write_var
     upvar $write_var write
     upvar $admin_var admin
 
-    set view 0
-    set read 0
-    set write 0
-    set admin 0
+    set user_is_freelance_p [im_user_is_freelance_p $user_id]
+    set user_is_customer_p [im_user_is_customer_p $user_id]
 
     # determine customer & provider
     set customer_id 0
@@ -96,20 +94,26 @@ ad_proc -public im_cost_permissions {user_id cost_id view_var read_var write_var
                 cost_id = :cost_id
     "
 
+    # Customers get the right to see _their_ invoices
     set cust_view 0
     set cust_read 0
     set cust_write 0
     set cust_admin 0
-    if {$customer_id} {
+    if {$user_is_customer_p && $customer_id && $customer_id != [im_company_internal]} {
         im_company_permissions $user_id $customer_id cust_view cust_read cust_write cust_admin
     }
 
-
+    # Providers get the right to see _their_ invoices
+    # This leads to the fact that FreelanceManagers (the guys
+    # who can convert themselves into freelancers) can also
+    # see the freelancer's permissions. Is this desired?
+    # I guess yes, even if they don't usually have the permission
+    # to see finance.
     set prov_view 0
     set prov_read 0
     set prov_write 0
     set prov_admin 0
-    if {$provider_id} {
+    if {$user_is_freelance_p && $provider_id && $provider_id != [im_company_internal]} {
         im_company_permissions $user_id $provider_id prov_view prov_read prov_write prov_admin
     }
 
@@ -124,6 +128,7 @@ ad_proc -public im_cost_permissions {user_id cost_id view_var read_var write_var
         set read 1
         set view 1
     }
+
 
     set can_read [expr [im_permission $user_id view_costs] || [im_permission $user_id view_invoices]]
     set can_admin [expr [im_permission $user_id add_costs] || [im_permission $user_id add_invoices]]
