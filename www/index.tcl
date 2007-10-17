@@ -101,4 +101,8 @@ db_foreach menu_select $menu_select_sql {
 	append customers_menu "<li><a href=\"$url\">[_ intranet-invoices.$name_key]</a></li>\n"
     }
 
+set sub_navbar [im_costs_navbar "none" "/intranet/invoices/index" "" "" [list] "costs_home"] 
+
+
+
 
