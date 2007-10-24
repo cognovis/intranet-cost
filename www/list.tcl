@@ -427,23 +427,7 @@ set button_html "
 # 10. Join all parts together
 # ---------------------------------------------------------------
 
-set page_body "
-$filter_html
-[im_costs_navbar $letter "/intranet-cost/list" $next_page_url $previous_page_url [list cost_status_id cost_type_id company_id start_idx order_by how_many view_name letter] "<#_ costs#>"]
-
-<form action=/intranet-cost/costs/cost-action method=POST>
-[export_form_vars company_id cost_id return_url]
-  <table width=100% cellpadding=2 cellspacing=2 border=0>
-    $table_header_html
-    $table_body_html
-    $table_continuation_html
-    $button_html
-  </table>
-</form>
-
-"
-
-set sub_navbar [im_costs_navbar "none" "/intranet-cost/list" $next_page_url $previous_page_url [list cost_status_id cost_type_id company_id start_idx order_by how_many view_name letter] "<#_ costs#>"] 
+set sub_navbar [im_costs_navbar "none" "/intranet-cost/list" $next_page_url $previous_page_url [list cost_status_id cost_type_id company_id start_idx order_by how_many view_name letter] ""] 
 
 db_release_unused_handles
 
