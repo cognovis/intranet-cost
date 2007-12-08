@@ -1529,7 +1529,7 @@ ad_proc im_costs_project_finance_component {
     append prelim_cost_html "<td align=right>- $subtotal $default_currency</td>\n"
     set grand_total [expr $grand_total - $subtotal]
 
-    append prelim_cost_html "</tr>\n<tr>\n<td>[_ intranet-cost.Timesheet_Costs]</td>\n"
+    append prelim_cost_html "</tr>\n<tr>\n<td>[lang::message::lookup "" intranet-cost.Timesheet_Budget "Timesheet Budget"]</td>\n"
     set subtotal $subtotals([im_cost_type_timesheet_budget])
     append prelim_cost_html "<td align=right>- $subtotal $default_currency</td>\n"
     set grand_total [expr $grand_total - $subtotal]
