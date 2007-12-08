@@ -18,3 +18,7 @@ end;' language 'plpgsql';
 
 update acs_object_types set name_method = 'im_cost__name' where object_type = 'im_cost';
 
+
+
+INSERT INTO im_categories (CATEGORY_ID, CATEGORY, CATEGORY_TYPE)
+VALUES (3726,'Timesheet Budget','Intranet Cost Type');

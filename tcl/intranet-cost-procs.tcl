@@ -42,6 +42,8 @@ ad_proc -public im_cost_type_expense_item {} { return 3720 }
 ad_proc -public im_cost_type_expense_report {} { return 3722 }
 ad_proc -public im_cost_type_delivery_note {} { return 3724 }
 #ad_proc -public im_cost_type_delnote {} { return 3724 }
+ad_proc -public im_cost_type_timesheet_budget {} { return 3726 }
+
 
 
 ad_proc -public im_cost_type_short_name { cost_type_id } { 
@@ -1528,11 +1530,10 @@ ad_proc im_costs_project_finance_component {
     set grand_total [expr $grand_total - $subtotal]
 
     append prelim_cost_html "</tr>\n<tr>\n<td>[_ intranet-cost.Timesheet_Costs]</td>\n"
-    
-    append prelim_cost_html "<td align=right>
-<!--	  $subtotals([im_cost_type_timesheet]) $default_currency -->
-	</td>\n"
-
+    set subtotal $subtotals([im_cost_type_timesheet_budget])
+    append prelim_cost_html "<td align=right>- $subtotal $default_currency</td>\n"
+    set grand_total [expr $grand_total - $subtotal]
+ 
     append prelim_cost_html "</tr>\n<tr>\n<td>[lang::message::lookup "" intranet-cost.Expenses "Expenses"]</td>\n"
     append prelim_cost_html "<td align=right>
 <!--	  $subtotals([im_cost_type_expense_report]) $default_currency -->
@@ -1889,6 +1890,10 @@ ad_proc -public im_cost_update_project_cost_cache {
 } {
     set default_currency [ad_parameter -package_id [im_package_cost_id] "DefaultCurrency" "" "EUR"]
 
+    # How much does our internal staff cost per hour? Refers to Default Currency
+    set default_hourly_cost [parameter::get_from_package_key -package_key intranet-cost -parameter "DefaultTimesheetHourlyCost" -default 30]
+
+
     # Update the logged hours cache
     im_timesheet_update_timesheet_cache -project_id $project_id
 
@@ -1958,6 +1963,12 @@ ad_proc -public im_cost_update_project_cost_cache {
 	if {"" == $amount_converted} { set amount_converted 0 }
         set subtotals($cost_type_id) $amount_converted
     }
+
+    # Timesheet Budget is calculated based on the "project_budget_hours" field
+    set project_budget_hours [db_string budget_hours "select project_budget_hours from im_projects where project_id = :project_id" -default 0]
+    if {"" == $project_budget_hours} { set project_budget_hours 0 }
+    set prelim_cost_timesheet [expr $project_budget_hours * $default_hourly_cost]
+    set subtotals([im_cost_type_timesheet_budget]) $prelim_cost_timesheet
 
     # We can update the profit & loss because all financial documents
     # have been converted to default_currency
