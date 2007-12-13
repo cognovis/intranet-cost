@@ -1241,8 +1241,6 @@ ad_proc im_costs_project_finance_component {
     </ul>
 
 } {
-#    ad_return_complaint 1 "details=$show_details_p, summary=$show_summary_p, admin=$show_admin_links_p"
-
     if {$show_details_p} { set show_admin_links_p 1 }
 
     if {![im_permission $user_id view_costs]} {	return "" }
@@ -1963,6 +1961,8 @@ ad_proc -public im_cost_update_project_cost_cache {
 	if {"" == $amount_converted} { set amount_converted 0 }
         set subtotals($cost_type_id) $amount_converted
     }
+    
+#    ad_return_complaint 1 [array get subtotals]
 
     # Timesheet Budget is calculated based on the "project_budget_hours" field
     set project_budget_hours [db_string budget_hours "select project_budget_hours from im_projects where project_id = :project_id" -default 0]
