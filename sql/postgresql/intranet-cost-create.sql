@@ -624,6 +624,9 @@ create table im_costs (
 	planning_type_id	integer
 				constraint im_costs_planning_type_fk
 				references im_categories,
+	read_only_p		char(1) default 'f'
+				constraint im_costs_read_only_ck
+				check (read_only_p in ('t','f')),
 	description		varchar(4000),
 	note			varchar(4000),
 	-- Audit fields
