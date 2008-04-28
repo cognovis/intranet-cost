@@ -254,6 +254,8 @@ where cost_center_id is null;
 -------------------------------------------------------------
 -- New view to im_cost_type(s). The (s) is new, corrected.
 --
+drop view im_cost_types;
+
 create or replace view im_cost_types as
 select	category_id as cost_type_id, 
 	category as cost_type,
@@ -328,9 +330,17 @@ BEGIN
 		from	im_cost_centers
 	LOOP
 		RAISE NOTICE ''inline_0: cc_id=%'', row.cost_center_id;
-		update acs_objects
-		set context_id = row.parent_id
-		where object_id = row.cost_center_id;
+
+		BEGIN
+
+			update acs_objects
+			set context_id = row.parent_id
+			where object_id = row.cost_center_id;
+
+		EXCEPTION WHEN unique_violation THEN
+			RAISE NOTICE ''inline_0: cc_id=%: Unique constraint violation'', row.cost_center_id;
+		END;
+
 	END LOOP;
 	return 0;
 
