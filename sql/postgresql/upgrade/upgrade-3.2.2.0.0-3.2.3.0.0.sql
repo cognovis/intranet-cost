@@ -5,14 +5,25 @@
 -- All rights including reserved. To inquire license terms please
 -- refer to http://www.project-open.com/modules/<module-key>
 
--- (re-) create to make sure the drop works
-create or replace view im_cost_type as
-select  category_id as cost_type_id,
-        category as cost_type
-from    im_categories
-where   category_type = 'Intranet Cost Type';
 
-drop view im_cost_types;
+SELECT acs_log__debug('/packages/intranet-cost/sql/postgresql/upgrade/upgrade-3.2.2.0.0-3.2.3.0.0.sql','');
+
+create or replace function inline_0 ()
+returns integer as '
+declare
+        v_count                 integer;
+begin
+	select count(*) into v_count from pg_views
+	where lower(viewname) = ''im_cost_types'';
+	if v_count = 0 then return 0; end if;
+
+	drop view im_cost_types;
+
+	return 0;
+end;' language 'plpgsql';
+select inline_0 ();
+drop function inline_0 ();
+
 
 create or replace view im_cost_types as
 select  category_id as cost_type_id,

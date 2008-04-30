@@ -1,5 +1,8 @@
 -- upgrade-3.3.1.0.0-3.3.1.1.0.sql
 
+SELECT acs_log__debug('/packages/intranet-cost/sql/postgresql/upgrade/upgrade-3.3.1.0.0-3.3.1.1.0.sql','');
+
+
 
 create or replace function im_cost__name (integer)
 returns varchar as '

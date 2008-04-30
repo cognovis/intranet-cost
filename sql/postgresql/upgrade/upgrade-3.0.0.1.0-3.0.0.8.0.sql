@@ -1,16 +1,32 @@
+-- upgrade-3.0.0.1.0-3.0.0.8.0.sql
+
+SELECT acs_log__debug('/packages/intranet-cost/sql/postgresql/upgrade/upgrade-3.0.0.1.0-3.0.0.8.0.sql','');
 
 
 -- Add fields to store results from adding up costs in 
 -- the "Finance" view of a project.
 
-alter table im_projects add	cost_quotes_cache		numeric(12,2);
-alter table im_projects add	cost_invoices_cache		numeric(12,2);
-alter table im_projects add	cost_timesheet_planned_cache	numeric(12,2);
 
-alter table im_projects add	cost_purchase_orders_cache	numeric(12,2);
-alter table im_projects add	cost_bills_cache		numeric(12,2);
-alter table im_projects add	cost_timesheet_logged_cache	numeric(12,2);
+create or replace function inline_0 ()
+returns integer as '
+declare
+	v_count			integer;
+begin
+	select	count(*) into v_count from user_tab_columns
+	where	table_name = ''IM_PROJECTS'' and column_name = ''COST_QUOTES_CACHE'';
+	if v_count > 0 then return 0; end if;
 
+	alter table im_projects add	cost_quotes_cache		numeric(12,2);
+	alter table im_projects add	cost_invoices_cache		numeric(12,2);
+	alter table im_projects add	cost_timesheet_planned_cache	numeric(12,2);
+	alter table im_projects add	cost_purchase_orders_cache	numeric(12,2);
+	alter table im_projects add	cost_bills_cache		numeric(12,2);
+	alter table im_projects add	cost_timesheet_logged_cache	numeric(12,2);
+	
+	return 0;
+end;' language 'plpgsql';
+select inline_0 ();
+drop function inline_0 ();
 
 
 

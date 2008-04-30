@@ -8,6 +8,9 @@
 -- All rights including reserved. To inquire license terms please 
 -- refer to http://www.project-open.com/modules/<module-key>
 
+SELECT acs_log__debug('/packages/intranet-cost/sql/postgresql/upgrade/upgrade-3.2.0.0.0-3.2.2.0.0.sql','');
+
+
 -- Source new __new duplicate tollerant scripts
 \i ../../../../intranet-core/sql/postgresql/upgrade/upgrade-3.0.0.0.first.sql
 
