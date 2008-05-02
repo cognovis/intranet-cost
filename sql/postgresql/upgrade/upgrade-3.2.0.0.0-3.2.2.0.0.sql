@@ -257,7 +257,24 @@ where cost_center_id is null;
 -------------------------------------------------------------
 -- New view to im_cost_type(s). The (s) is new, corrected.
 --
-drop view im_cost_types;
+
+create or replace function inline_0 ()
+returns integer as '
+declare
+        v_count                 integer;
+begin
+	select count(*) into v_count from pg_views
+	where lower(viewname) = ''im_cost_types'';
+	if v_count = 0 then return 0; end if;
+
+	drop view im_cost_types;
+
+	return 0;
+end;' language 'plpgsql';
+select inline_0 ();
+drop function inline_0 ();
+
+
 
 create or replace view im_cost_types as
 select	category_id as cost_type_id, 
@@ -332,17 +349,12 @@ BEGIN
 		select  *
 		from	im_cost_centers
 	LOOP
-		RAISE NOTICE ''inline_0: cc_id=%'', row.cost_center_id;
-
-		BEGIN
-
+		if row.cost_center_id != row.parent_id then
+			RAISE NOTICE ''inline_0: cc_id=%'', row.cost_center_id;
 			update acs_objects
 			set context_id = row.parent_id
 			where object_id = row.cost_center_id;
-
-		EXCEPTION WHEN unique_violation THEN
-			RAISE NOTICE ''inline_0: cc_id=%: Unique constraint violation'', row.cost_center_id;
-		END;
+		end if;
 
 	END LOOP;
 	return 0;
