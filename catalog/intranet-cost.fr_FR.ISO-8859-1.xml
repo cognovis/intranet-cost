@@ -11,6 +11,7 @@
   <msg key="Company">Société</msg>
   <msg key="context">contexte</msg>
   <msg key="Cost_Center">Centre de coût</msg>
+  <msg key="Cost_Center_permissions_help">Aide sur les Centres de Coûts</msg>
   <msg key="Cost_Centers">Centres de coût</msg>
   <msg key="Cost_Items">Eléments de coût</msg>
   <msg key="create">créer</msg>
@@ -19,6 +20,7 @@
   <msg key="Customer_Invoices">Factures Client</msg>
   <msg key="Customers">Clients</msg>
   <msg key="Del">Suppr</msg>
+  <msg key="DeptQuest">Département</msg>
   <msg key="Description">Description</msg>
   <msg key="Document">Document</msg>
   <msg key="Document_Status">Statut du document</msg>
@@ -28,9 +30,12 @@
   <msg key="Due_Date">Date échéance</msg>
   <msg key="Edit_Cost">Modifier coût</msg>
   <msg key="Effective_Date">Date d'effet</msg>
+  <msg key="Employees">Employés</msg>
+  <msg key="Expenses">Frais</msg>
   <msg key="Filter_Documents">Filtrer les Documents</msg>
   <msg key="finance">finance</msg>
   <msg key="Finance_Home">Finance - Accueil</msg>
+  <msg key="Finance_Summary">Résumé Finance</msg>
   <msg key="Financial_Documents">Documents financiers</msg>
   <msg key="Financial_Summary">Récapitulatif financier</msg>
   <msg key="Go">Go</msg>
