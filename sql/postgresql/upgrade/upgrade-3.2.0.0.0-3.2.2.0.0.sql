@@ -227,11 +227,12 @@ BEGIN
 
 	update acs_objects
 		set context_id = v_subsite_id
-	where object_id in (
-		select cost_center_id
-		from im_cost_centers
-		where cost_center_label=''company''
-	);
+	where
+		object_id in (
+			select	cost_center_id
+			from	im_cost_centers
+		) and
+		context_id is null;
 
 	return 0;
 end;' language 'plpgsql';
