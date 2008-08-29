@@ -695,7 +695,7 @@ ad_proc -public template::widget::im_cost_center_tree { element_reference tag_at
     } else {
 
 	if {"" != $default_value && "\{\}" != $default_value} {
-	    return [db_string cat "select im_category_from_id($default_value)"]
+	    return [db_string cat "select acs_object__name($default_value)"]
 	}
 	return ""
     }
