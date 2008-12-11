@@ -758,6 +758,11 @@ returns integer as '
 DECLARE
 	p_cost_id alias for $1;
 begin
+	-- Update im_hours relationship
+	update	im_hours
+	set cost_id = null
+	where cost_id = p_cost_id;
+
 	-- Erase the im_cost
 	delete from     im_costs
 	where		cost_id = p_cost_id;
