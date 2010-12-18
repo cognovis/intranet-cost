@@ -119,30 +119,33 @@ ad_form -extend -name cost_center -on_request {
 
 } -edit_data {
 
-    db_dml cost_center_update "
-	update im_cost_centers set
-		cost_center_name	= :cost_center_name,
-		cost_center_label	= :cost_center_label,
-		cost_center_code 	= :cost_center_code,
-		cost_center_type_id	= :cost_center_type_id,
-		cost_center_status_id	= :cost_center_status_id,
-		department_p		= :department_p,
-		parent_id		= :parent_id,
-		manager_id		= :manager_id,
-		description		= :description
-	where
-		cost_center_id = :cost_center_id
-    "
+    # check if current CC <> Parent CC
+    if {$parent_id == $cost_center_id} {
+	ad_return_complaint 1 "Parent Cost Center can't be equal to Cost Center"
+    } else {
+	db_dml cost_center_update "
+		update im_cost_centers set
+			cost_center_name	= :cost_center_name,
+			cost_center_label	= :cost_center_label,
+			cost_center_code 	= :cost_center_code,
+			cost_center_type_id	= :cost_center_type_id,
+			cost_center_status_id	= :cost_center_status_id,
+			department_p		= :department_p,
+			parent_id		= :parent_id,
+			manager_id		= :manager_id,
+			description		= :description
+		where
+			cost_center_id = :cost_center_id
+		"
+		db_dml cost_center_context_update {}
 
-    db_dml cost_center_context_update {}
-
-    im_dynfield::attribute_store \
-	-object_type "im_cost_center" \
-	-object_id $cost_center_id \
-	-form_id cost_center
-    
-    # Write Audit Trail
-    im_audit -object_id $cost_center_id -action update
+	    	im_dynfield::attribute_store \
+			-object_type "im_cost_center" \
+			-object_id $cost_center_id \
+			-form_id cost_center
+	    # Write Audit Trail
+	    im_audit -object_id $cost_center_id -action update
+    }
 
 } -on_submit {
 
