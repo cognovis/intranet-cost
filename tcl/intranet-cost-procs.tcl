@@ -286,30 +286,18 @@ ad_proc -public im_cost_type_write_permissions_helper {
 # Options & Selects
 # -----------------------------------------------------------
 
-ad_proc -public im_cost_uom_options {
-    {-locale ""}
-    {-translate_p 1}
+ad_proc -public im_cost_uom_options { 
     {include_empty 1} 
 } {
     Cost UoM (Unit of Measure) options
 } {
-    if {"" == $locale && $translate_p} { set locale [lang::user::locale -user_id [ad_get_user_id]] }
-
-    set options_sql "
+    set options [db_list_of_lists cost_type_options "
         select	category, category_id
         from	im_categories
 	where	category_type = 'Intranet UoM' and
 		(enabled_p is null OR enabled_p = 't')
-    "
-    set options [list]
-    if {$include_empty} { set options [list "" ""] }
-    db_foreach uom_options $options_sql {
-	set category_l10n $category
-	if {$translate_p} {
-	    set category_l10n [lang::message::lookup $locale intranet-core.[lang::util::suggest_key $category] $category]
-	}
-	lappend options [list $category_l10n $category_id]
-    }
+    "]
+    if {$include_empty} { set options [linsert $options 0 { "" "" }] }
     return $options
 }
 
@@ -578,7 +566,8 @@ ad_proc -public im_costs_navbar {
     next_page_url 
     prev_page_url 
     export_var_list 
-    {select_label ""} 
+    {select_label ""}
+    {navbar_export_var_list ""}
 } {
     Returns rendered HTML code for a horizontal sub-navigation
     bar for /intranet-cost/.
@@ -601,15 +590,24 @@ ad_proc -public im_costs_navbar {
         upvar 1 $var value
         if { [info exists value] } {
             ns_set put $bind_vars $var $value
-            ns_log Notice "im_costs_navbar: $var <- $value"
+            ns_log Debug "im_costs_navbar: $var <- $value"
         }
     }
+
     set alpha_bar [im_alpha_bar -prev_page_url $prev_page_url -next_page_url $next_page_url $base_url $default_letter $bind_vars]
 
     # Get the Subnavbar
+    set navbar_bind_vars [ns_set create]
+    foreach var $navbar_export_var_list {
+        upvar 1 $var value
+        if { [info exists value] } {
+            ns_set put $navbar_bind_vars $var $value
+            ns_log Debug "im_costs_navbar: $var <- $value"
+        }
+    }
     set parent_menu_sql "select menu_id from im_menus where label='finance'"
     set parent_menu_id [util_memoize [list db_string parent_admin_menu $parent_menu_sql -default 0]]
-    set navbar [im_sub_navbar $parent_menu_id "" $alpha_bar "tabnotsel" $select_label]
+    set navbar [im_sub_navbar $parent_menu_id $navbar_bind_vars $alpha_bar "tabnotsel" $select_label]
 
     return $navbar
 }
@@ -1673,7 +1671,8 @@ ad_proc im_costs_project_finance_component {
 
 
     set summary_html ""
-    if {$show_details_p} {
+
+    if {1} {
 
 	# Summary in broad format
 	set summary_html "
@@ -2200,6 +2199,18 @@ ad_proc -public im_navbar_tree_finance {
     return $html
 }
 
+ad_proc -public -callback im_cost_after_update -impl im_cost_save_vat {
+    {-object_id:required}
+    {-status_id ""}
+    {-type_id ""}
+} {
+    If a cost is saved automatically save the vat
+} {
+    set vat [db_string category "select aux_int1 from im_costs c, im_categories ca where ca.category_id = c.vat_type_id and c.cost_id = :object_id" -default ""]
+
+    db_dml update_cost "update im_costs set vat = :vat where cost_id = :object_id"
+}
+
 
 # -----------------------------------------------------------
 # Show a list of icons representing financial documents
@@ -2273,4 +2284,5 @@ ad_proc -public im_cost_project_document_icons_helper {
     }
 
     return $result
+
 }
