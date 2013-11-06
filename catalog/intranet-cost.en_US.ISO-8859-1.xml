@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="ISO-8859-1"?>
-<message_catalog package_key="intranet-cost" package_version="3.4.0.7.0" locale="en_US" charset="ISO-8859-1">
+<message_catalog package_key="intranet-cost" locale="en_US" charset="ISO-8859-1">
 
   <msg key="Absences">Absences</msg>
   <msg key="Accounts_Payable">Accounts Payable</msg>
@@ -16,14 +16,19 @@
   <msg key="Cost_Center_permissions_help">Cost Center Permissions Help</msg>
   <msg key="Cost_Centers">Cost Centers</msg>
   <msg key="Cost_Items">Cost Items</msg>
+  <msg key="CostCenter">Cost Center Code</msg>
   <msg key="CostCenter_short">CC</msg>
   <msg key="create">create</msg>
+  <msg key="Created">Created</msg>
+  <msg key="Creator">Creator</msg>
   <msg key="Currency">Currency</msg>
   <msg key="Customer">Customer</msg>
   <msg key="Customer_Invoices">Customer Invoices</msg>
   <msg key="Customer_Links">Customer Links</msg>
   <msg key="Customers">Customers</msg>
   <msg key="Del">Del</msg>
+  <msg key="Deleted">Deleted</msg>
+  <msg key="DeptQuest">Department?</msg>
   <msg key="Description">Description</msg>
   <msg key="Document">Document</msg>
   <msg key="Document_Status">Document Status</msg>
@@ -33,17 +38,22 @@
   <msg key="Due_Date">Due Date</msg>
   <msg key="Edit_Cost">Edit Cost</msg>
   <msg key="Effective_Date">Effective Date</msg>
+  <msg key="Exchange_Rates">Exchange Rates</msg>
   <msg key="Expenses">Expenses</msg>
   <msg key="Export_Finance_to_CSV">Export Finance to CSV</msg>
+  <msg key="Filed">Filed</msg>
+  <msg key="Filter_Costs">Filter Costs</msg>
   <msg key="Filter_Documents">Filter Documents</msg>
   <msg key="Finance">Finance</msg>
   <msg key="finance">finance</msg>
   <msg key="Finance_Home">Finance Home</msg>
   <msg key="Finance_Summary">Finance Summary</msg>
   <msg key="Financial_Documents">Financial Documents</msg>
+  <msg key="Financial_Indicators_Timeline">Financial Indicators Timeline</msg>
   <msg key="Financial_Summary">Financial Summary</msg>
   <msg key="Go">Go</msg>
   <msg key="Grand_Total">Grand Total</msg>
+  <msg key="InheritFrom">Inherit From</msg>
   <msg key="Investment">Investment</msg>
   <msg key="lt_Cost_Item_Administrat">Cost Item Administration</msg>
   <msg key="lt_Create_a_new_purchase">Create a new purchase order</msg>
@@ -67,9 +77,11 @@ While this is OK in general, it will keep us from calculating a single profit&am
   <msg key="New_Cost">New Cost</msg>
   <msg key="New_Cost_Item">New Cost Item</msg>
   <msg key="New_Customer_Docs">Create a New Customer Document</msg>
+  <msg key="New_Customer_Documents">New Customer Documents</msg>
   <msg key="New_Customer_Invoices_Quotes">New Cust. Invoices &amp; Quotes</msg>
   <msg key="New_Provider_Bills_POs">New Prov. Bills &amp; POs</msg>
   <msg key="New_Provider_Docs">Create a New Provider Document</msg>
+  <msg key="New_Provider_Documents">New Provider Documents</msg>
   <msg key="New_Timesheet_Invoice">New Timesheet Invoice</msg>
   <msg key="New_Trans_Invoice">New Trans Invoice</msg>
   <msg key="Next_Page">Next Page</msg>
@@ -78,9 +90,12 @@ While this is OK in general, it will keep us from calculating a single profit&am
   <msg key="Org_Amount">Org</msg>
   <msg key="Outdated_Message">Outdated Exchange Rates Warning</msg>
   <msg key="Outdated_since_x_days">Outdated since %days% days</msg>
+  <msg key="Outstanding">Outstanding</msg>
   <msg key="Paid">Paid</msg>
   <msg key="Paid_Amount">Paid Amount</msg>
   <msg key="Paid_Currency">Paid Currency</msg>
+  <msg key="Partially_Paid">Partially Paid</msg>
+  <msg key="Past_Due">Past Due</msg>
   <msg key="Payment_Days">Payment Days</msg>
   <msg key="Payments">Payments</msg>
   <msg key="Perms">Perms</msg>
@@ -97,7 +112,10 @@ While this is OK in general, it will keep us from calculating a single profit&am
   <msg key="Purchase_Orders">Purchase Orders</msg>
   <msg key="Quotes">Quotes</msg>
   <msg key="Real_Costs">Real Costs</msg>
+  <msg key="Rejected">Rejected</msg>
   <msg key="Repeating_Costs">Repeating Costs</msg>
+  <msg key="Reports">Reports</msg>
+  <msg key="Requested">Requested</msg>
   <msg key="Save">Save</msg>
   <msg key="Start_Block">Start Block</msg>
   <msg key="Status">Status</msg>
@@ -105,6 +123,8 @@ While this is OK in general, it will keep us from calculating a single profit&am
   <msg key="The_exchange_rates_are_outdated">The exchanges rates for the following currencies are outdated. Please contact your System Administrator to update the following exchange rates:</msg>
   <msg key="Timesheet_Budget">Timesheet Budget</msg>
   <msg key="Timesheet_Costs">Timesheet Costs</msg>
+  <msg key="Top_10_Unpaid_Customer_Invoices">Top 10 Unpaid Customer Invoices</msg>
+  <msg key="Top_10_Unpaid_Provider_Bills">Top 10 Unpaid Provider Bills</msg>
   <msg key="Type">Type</msg>
   <msg key="VAT">VAT</msg>
   <msg key="Who_gets_the_money">Who gets the money?</msg>
