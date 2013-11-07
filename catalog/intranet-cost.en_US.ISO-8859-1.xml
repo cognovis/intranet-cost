@@ -8,6 +8,7 @@
   <msg key="Administration">Administration</msg>
   <msg key="All_Costs">All Costs</msg>
   <msg key="Amount">Amount</msg>
+  <msg key="Amount_without_VAT">Amount without VAT</msg>
   <msg key="Client">Customer</msg>
   <msg key="Companies">Companies</msg>
   <msg key="Company">Company</msg>
@@ -38,6 +39,7 @@
   <msg key="Due_Date">Due Date</msg>
   <msg key="Edit_Cost">Edit Cost</msg>
   <msg key="Effective_Date">Effective Date</msg>
+  <msg key="Employees">Employees</msg>
   <msg key="Exchange_Rates">Exchange Rates</msg>
   <msg key="Expenses">Expenses</msg>
   <msg key="Export_Finance_to_CSV">Export Finance to CSV</msg>
@@ -65,6 +67,7 @@
   <msg key="lt_This_is_the_homepage_">This is the homepage of the &quot;Financial Area&quot;. Here you can
     find and enter all information about companies, projects
     and users.</msg>
+  <msg key="Manager">Manager</msg>
   <msg key="Materials_Service_Types">Materials (Service Types)</msg>
   <msg key="more_costs">more costs...</msg>
   <msg key="Multiple_Currency_Warning">&lt;h2&gt;Multiple Currency Warning&lt;/h2&gt;
@@ -86,6 +89,7 @@ While this is OK in general, it will keep us from calculating a single profit&am
   <msg key="New_Trans_Invoice">New Trans Invoice</msg>
   <msg key="Next_Page">Next Page</msg>
   <msg key="Note">Note</msg>
+  <msg key="Number_billable_expenses">Number billable expenses</msg>
   <msg key="Options">Options:</msg>
   <msg key="Org_Amount">Org</msg>
   <msg key="Outdated_Message">Outdated Exchange Rates Warning</msg>
@@ -126,6 +130,7 @@ While this is OK in general, it will keep us from calculating a single profit&am
   <msg key="Top_10_Unpaid_Customer_Invoices">Top 10 Unpaid Customer Invoices</msg>
   <msg key="Top_10_Unpaid_Provider_Bills">Top 10 Unpaid Provider Bills</msg>
   <msg key="Type">Type</msg>
+  <msg key="Update_Exchange_Rates">Update Exchange Rates</msg>
   <msg key="VAT">VAT</msg>
   <msg key="Who_gets_the_money">Who gets the money?</msg>
   <msg key="Who_pays">Who pays?</msg>
