@@ -1,5 +1,5 @@
 <if @read@>
-<table>
+<table width="100%">
 @html;noquote@
 </table>
 </if>

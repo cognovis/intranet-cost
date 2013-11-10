@@ -146,7 +146,7 @@ set reports_menu "<ul>"
 set ctr 0
 db_foreach menu_select $menu_select_sql {
     ns_log Notice "im_sub_navbar: menu_name='$name'"
-    regsub -all " " $name "_" name_key
+    set name_key [string map {" " "_" "(" "" ")" ""} $name]
     set wrench_url [export_vars -base "/intranet/admin/menus/index" {menu_id return_url}]
     append reports_menu "<li><a href=\"$url\">[lang::message::lookup "" intranet-reporting.$name_key $name]</a>
                                <a href='$wrench_url'>[im_gif wrench]</a></li>
@@ -155,7 +155,6 @@ db_foreach menu_select $menu_select_sql {
 }
 append reports_menu "</ul>"
 set reports_ctr $ctr
-
 
 
 
@@ -185,8 +184,8 @@ ad_form \
     -method GET \
     -export {start_idx order_by how_many view_name letter } \
     -form {
-	{cost_status_id:text(im_category_tree),optional {label "[lang::message::lookup {} intranet-cost.Status Status]"} {custom {category_type "Intranet Cost Status" translate_p 1 package_key "intranet-cost"}} }
-	{cost_type_id:text(im_category_tree),optional {label "[lang::message::lookup {} intranet-cost.Type Type]"} {custom {category_type "Intranet Cost Type" translate_p 1 package_key "intranet-cost"} } }
+	{cost_status_id:text(im_category_tree),optional {label "[lang::message::lookup {} intranet-cost.Status Status]"} {custom {category_type "Intranet Cost Status" translate_p 1 package_key "intranet-core"}} }
+	{cost_type_id:text(im_category_tree),optional {label "[lang::message::lookup {} intranet-cost.Type Type]"} {custom {category_type "Intranet Cost Type" translate_p 1 package_key "intranet-core"} } }
 	{cost_creator_id:text(select),optional {label "[lang::message::lookup {} intranet-cost.Creator Creator]"} {options $cost_creator_options}}
     }
 

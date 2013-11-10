@@ -46,18 +46,29 @@ foreach project_id [array names project_hash] {
 	set key "$project_id-$cost_type_id"
 	if {![info exists costs($key)]} { set costs($key) 0 }
     }
+    if {[catch {
+	set est_profit [expr $costs($project_id-3702) - $costs($project_id-3706) - $costs($project_id-3726) - $costs($project_id-3728)]
+    } err_msg]} {
+	ns_log ERROR "$err_msg"
+	set est_profit [lang::message::lookup "" intranet-cost.UnableToCalculateEstimatedProfit "Unable to calculate 'Estimated Profit'"]
+    }
 
-    set est_profit [expr $costs($project_id-3702) - $costs($project_id-3706) - $costs($project_id-3726) - $costs($project_id-3728)]
-    set profit [expr $costs($project_id-3700) - $costs($project_id-3704) - $costs($project_id-3718) - $costs($project_id-3722)]
+    if {[catch {
+	set profit [expr $costs($project_id-3700) - $costs($project_id-3704) - $costs($project_id-3718) - $costs($project_id-3722)]
+	set profit_pretty [lc_numeric $profit "%.2f" [lang::user::locale]]
+    } err_msg]} {
+        ns_log ERROR "$err_msg"
+        set profit_pretty [lang::message::lookup "" intranet-cost.UnableToCalculateProfit "Unable to calculate 'Profit'"]
+    }
 
     set line "
  	<tr valign=middle>
 	<td><a href=[export_vars -base "/intranet/projects/view" {project_id {view_name finance}}]>$project_name</a></td>
-	<td align=right>$est_profit<br>$profit</td>
-	<td align=right>$costs($project_id-3702)<br>$costs($project_id-3700)</td> <!-- quote / invoice -->
-	<td align=right>$costs($project_id-3706)<br>$costs($project_id-3704)</td> <!-- po / bill -->
-	<td align=right>$costs($project_id-3726)<br>$costs($project_id-3718)</td> <!-- ts budget / ts costs -->
-	<td align=right>$costs($project_id-3728)<br>$costs($project_id-3722)</td> <!-- expense budget / expenses -->
+	<td align=right>$est_profit<br>$profit_pretty</td>
+	<td align=right>$costs($project_id-3702)<br>[lc_numeric $costs($project_id-3700) "%.2f" [lang::user::locale]]</td> <!-- quote / invoice -->
+	<td align=right>$costs($project_id-3706)<br>[lc_numeric $costs($project_id-3704) "%.2f" [lang::user::locale]]</td> <!-- po / bill -->
+	<td align=right>$costs($project_id-3726)<br>[lc_numeric $costs($project_id-3718) "%.2f" [lang::user::locale]]</td> <!-- ts budget / ts costs -->
+	<td align=right>$costs($project_id-3728)<br>[lc_numeric $costs($project_id-3722) "%.2f" [lang::user::locale]]</td> <!-- expense budget / expenses -->
 	</tr>
     "
     append lines $line
