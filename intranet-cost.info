@@ -19,6 +19,7 @@
         <requires url="acs-subsite" version="5.1.3"/>
         <requires url="intranet-core" version="3.0.0.0.0"/>
         <requires url="intranet-exchange-rate" version="3.0.0.0.0"/>
+        <requires url="intranet-search-pg" version="4.0.0.0.0"/>
 
         <callbacks>
         </callbacks>

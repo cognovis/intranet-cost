@@ -61,6 +61,11 @@ foreach project_id [array names project_hash] {
         set profit_pretty [lang::message::lookup "" intranet-cost.UnableToCalculateProfit "Unable to calculate 'Profit'"]
     }
 
+    if { "" == $costs($project_id-3700) } {set costs($project_id-3700) 0 }
+    if { "" == $costs($project_id-3704) } {set costs($project_id-3700) 0 }
+    if { "" == $costs($project_id-3718) } {set costs($project_id-3700) 0 }
+    if { "" == $costs($project_id-3722) } {set costs($project_id-3700) 0 }
+
     set line "
  	<tr valign=middle>
 	<td><a href=[export_vars -base "/intranet/projects/view" {project_id {view_name finance}}]>$project_name</a></td>
