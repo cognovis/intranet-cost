@@ -85,7 +85,7 @@ if {![exists_and_not_null cost_id]} {
 
     set page_title "[_ intranet-cost.New_Cost_Item]"
     set context [im_context_bar $page_title]
-    set effective_date [db_string get_today "select to_date(sysdate,'YYYY-MM-DD') from dual"]
+    set effective_date [db_string get_today "select to_char(sysdate,'YYYY-MM-DD') from dual"]
     set payment_days [ad_parameter -package_id [im_package_cost_id] "DefaultProviderBillPaymentDays" "" 60]
     set customer_id [im_company_internal]
     set provider_id [im_company_internal]
