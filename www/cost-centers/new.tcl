@@ -107,7 +107,10 @@ ad_form -extend -name cost_center -on_request {
 } -new_data {
 
     set cost_center_id [db_string cost_center_insert {}]
-    db_dml cost_center_context_update {}
+    
+    # 2014-02-20 fraber: Generates a strange error.
+    # Why was this necessary in the first place?
+    # db_dml cost_center_context_update {}
 
     im_dynfield::attribute_store \
 	-object_type "im_cost_center" \
