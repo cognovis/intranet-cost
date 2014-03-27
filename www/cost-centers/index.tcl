@@ -108,7 +108,6 @@ db_foreach cost_centers $main_sql {
 	    </nobr>
             <td>$cost_center_code</td>
 	  </td>
-          <td>$cost_center_code</td>
 	  <td>$department_p</td>
 	  <td>$context</td>
 	  <td><a href=[export_vars -base "/intranet/users/view" -override {{user_id $manager_id}}]>$manager_name</a></td>
