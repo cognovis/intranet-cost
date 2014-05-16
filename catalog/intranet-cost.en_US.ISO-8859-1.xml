@@ -15,7 +15,7 @@
   <msg key="Company">Company</msg>
   <msg key="context">Context</msg>
   <msg key="Cost_Center">Cost Center</msg>
-  <msg key="Cost_Center_help">To show CC in right order please set 'Cost Center Code' accordingly. For additional help please use the 'Context Help' that is provided for this page.</msg>
+  <msg key="Cost_Center_help">&lt;ul&gt;&lt;li&gt;To show CC in right order please set 'Cost Center Code' accordingly. For additional help please see 'Context Help' that is provided for this page&lt;/li&gt;&lt;li&gt;Deleting Cost Centers from a productive system should be the exception. Whenever possible, set them to 'inactive'. If a Cost Center is removed from the system, all related costs will be transfered to the default Cost Center 'The Company'&lt;/li&gt;&lt;/ul&gt;</msg>
   <msg key="Cost_Center_permissions_help"></msg>
   <msg key="Cost_Centers">Cost Centers</msg>
   <msg key="Cost_Items">Cost Items</msg>

@@ -6,7 +6,7 @@
 
 <h1>@page_title@</h1>
 
-<%=[lang::message::lookup "" intranet-cost.Cost_Center_help "To show CC in right order please set 'Cost Center Code' accordingly. For additional help please use the 'Context Help' that is provided for this page."]%>
+@help_txt;noquote@
 <br><br>
 <form action=cost-center-action method=post>
       <%= [export_form_vars return_url] %>

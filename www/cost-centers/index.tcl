@@ -35,9 +35,14 @@ set group_url "/admin/groups/one"
 set bgcolor(0) " class=rowodd"
 set bgcolor(1) " class=roweven"
 
-if {"" == $return_url} {
-    set return_url [ad_conn url]
-}
+if {"" == $return_url} { set return_url [ad_conn url] }
+
+
+set help_str "<ul><li>To show CC in right order please set 'Cost Center Code' accordingly. For additional help please see 'Context Help' that is provided for this page</li>" 
+append help_str "<li><span>Please note:</span><br>Deleting Cost Centers from a productive system should be the exception. Whenever possible, set them to 'inactive'."
+append help_str "If a Cost Center is removed from the system, all related costs will be transfered to the default Cost Center 'The Company'.</li></ul>"
+set help_txt [lang::message::lookup "" intranet-cost.Cost_Center_help $help_str]
+
 
 set table_header "
 <tr>
