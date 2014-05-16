@@ -78,16 +78,17 @@ ad_proc -public im_department_options { {include_empty 0} } {
 }
 
 ad_proc -public im_cost_center_select { 
-    {-include_empty 0} 
-    {-include_empty_name "" }
-    {-department_only_p 0} 
+    { -include_empty 0 } 
+    { -include_empty_name "" }
+    { -department_only_p 0 } 
+    { -show_inactive_cc_p 0 }
     select_name 
-    {default ""} 
-    {cost_type_id ""} 
+    { default "" } 
+    { cost_type_id "" } 
 } {
     Returns a select box with all Cost Centers in the company.
 } {
-    set options [im_cost_center_options -include_empty $include_empty -include_empty_name $include_empty_name -department_only_p $department_only_p -cost_type_id $cost_type_id]
+    set options [im_cost_center_options -include_empty $include_empty -include_empty_name $include_empty_name -department_only_p $department_only_p -cost_type_id $cost_type_id -show_inactive_cc_p $show_inactive_cc_p]
 
     # Only one option, so 
     # write out string instead of select component
@@ -105,15 +106,17 @@ ad_proc -public im_cost_center_select {
 
 
 ad_proc -public im_cost_center_options { 
-    {-include_empty 0} 
-    {-include_empty_name "" }
-    {-department_only_p 0} 
-    {-cost_type_id ""} 
+    { -include_empty 0 } 
+    { -include_empty_name "" }
+    { -department_only_p 0 } 
+    { -cost_type_id ""} 
+    { -show_inactive_cc_p 0 } 
 } {
     Returns a list of all Cost Centers in the company.
     Takes into account the permission of the user to 
     charge FinDocs to CostCenters
 } {
+
     set user_id [ad_get_user_id]
     set start_center_id [im_cost_center_company]
     set cost_type "Invalid"
@@ -134,15 +137,21 @@ ad_proc -public im_cost_center_options {
 	set department_only_sql "and cc.department_p = 't'"
     }
 
+    if { $show_inactive_cc_p } {
+	set status_sql "1=1"
+    } else {
+        set status_sql "cost_center_status_id in (select * from im_sub_categories([im_cost_center_status_active]))"
+    }
+
     set options_sql "
         select	cc.cost_center_name,
                 cc.cost_center_id,
                 cc.cost_center_label,
-    		(length(cc.cost_center_code) / 2) - 1 as indent_level
+    		(length(cc.cost_center_code) / 2) - 1 as indent_level,
+		cost_center_status_id
         from	im_cost_centers cc
-	where	cost_center_status_id in (
-			select * from im_sub_categories([im_cost_center_status_active])
-		)
+	where	
+		$status_sql
 		$department_only_sql
 		$cost_type_sql
 	order by
@@ -157,7 +166,12 @@ ad_proc -public im_cost_center_options {
         for {set i 0} {$i < $indent_level} { incr i } {
             append spaces "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
         }
-        lappend options [list "$spaces$cost_center_name" $cost_center_id]
+	if { $cost_center_status_id == [im_cost_center_status_inactive] } {
+	    # this would not work, investigate when time: lappend options [list "$spaces<span class='select_option_inactive'>$cost_center_name</span>" $cost_center_id]
+	    lappend options [list "$spaces$cost_center_name&nbsp;([lang::message::lookup "" intranet-core.Inactive "Inactive"])" $cost_center_id]
+	} else {
+	    lappend options [list "$spaces$cost_center_name" $cost_center_id]
+	}
     }
 
     if {$include_empty && [llength $options] == 0} {
@@ -166,6 +180,7 @@ ad_proc -public im_cost_center_options {
     }
 
     return $options
+
 }
 
 
