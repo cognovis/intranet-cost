@@ -35,6 +35,7 @@ ad_proc -public im_cost_center_name {
     Returns the cached name of a cost center
 } {
     if {"" == $cost_center_id || ![string is integer $cost_center_id]} { set cost_center_id 0}
+    im_security_alert_check_integer -location "im_cost_center_name: cost_center_id" -value $cost_center_id
     return [util_memoize [list db_string ccname "select cost_center_name from im_cost_centers where cost_center_id = $cost_center_id" -default ""]]
 }
 
@@ -126,7 +127,7 @@ ad_proc -public im_cost_center_options {
     set short_name [im_cost_type_short_name $cost_type_id]
 
     # Profit-Center-Module (perms on CCs) installed?
-    set pcenter_p [util_memoize "db_string pcent {select count(*) from apm_packages where package_key = 'intranet-cost-center'}"]
+    set pcenter_p [util_memoize [list db_string pcent "select count(*) from apm_packages where package_key = 'intranet-cost-center'"]]
 
     if {$pcenter_p && "" != $cost_type_id} { 
 	set cost_type_sql "and im_object_permission_p(cost_center_id, :user_id, 'fi_write_${short_name}s') = 't'\n"
@@ -330,7 +331,7 @@ ad_proc -public -deprecated im_cost_center_read_p {
     expensive with a considerable number of financial docs.
 } {
     if {"" == $cost_center_id} { return 1 }
-    return [string equal "t" [util_memoize "im_cost_center_read_p_helper $cost_center_id $cost_type_id $user_id" 60]]
+    return [string equal "t" [util_memoize [list im_cost_center_read_p_helper $cost_center_id $cost_type_id $user_id] 60]]
 }
 
 ad_proc -private -deprecated im_cost_center_read_p_helper {
@@ -341,7 +342,7 @@ ad_proc -private -deprecated im_cost_center_read_p_helper {
     Returns "t" if the user can read the CC, "f" otherwise.
 } {
     # User can read all CCs if no Profit Center Controlling is installed
-    set pcenter_p [util_memoize "db_string pcent {select count(*) from apm_packages where package_key = 'intranet-cost-center'}"]
+    set pcenter_p [util_memoize [db_string pcent "select count(*) from apm_packages where package_key = 'intranet-cost-center'"]]
     if {!$pcenter_p} { return "t" }
 
     return [db_string cc_perms "
@@ -361,8 +362,12 @@ ad_proc -public im_cc_read_p {
     Returns "1" if the user can read the global "company" CC
 } {
     # User can read all CCs if no Profit Center Controlling is installed
-    set pcenter_p [util_memoize "db_string pcent {select count(*) from apm_packages where package_key = 'intranet-cost-center'}"]
+    set pcenter_p [util_memoize [db_string pcent "select count(*) from apm_packages where package_key = 'intranet-cost-center'"]]
     if {!$pcenter_p} { return 1 }
+    im_security_alert_check_integer -location "im_cc_read_p: user_id" -value $user_id
+    im_security_alert_check_integer -location "im_cc_read_p: cost_type_id" -value $cost_type_id
+    im_security_alert_check_integer -location "im_cc_read_p: cost_center_id" -value $cost_center_id
+    im_security_alert_check_alphanum -location "im_cc_read_p: privilege" -value $privilege
 
     # Deal with exceptions
     if {0 == $user_id} { set user_id [ad_get_user_id] }
@@ -394,7 +399,7 @@ ad_proc -public im_cost_center_write_p {
     expensive with a considerable number of financial docs.
 } {
     if {"" == $cost_center_id} { return 1 }
-    return [string equal "t" [util_memoize "im_cost_center_write_p_helper $cost_center_id $cost_type_id $user_id" 60]]
+    return [string equal "t" [util_memoize [list im_cost_center_write_p_helper $cost_center_id $cost_type_id $user_id] 60]]
 }
 
 ad_proc -public im_cost_center_write_p_helper {
@@ -405,7 +410,7 @@ ad_proc -public im_cost_center_write_p_helper {
     Returns "t" if the user can write to the CC, "f" otherwise.
 } {
     # User can write all CCs if no Profit Center Controlling is installed
-    set pcenter_p [util_memoize "db_string pcent {select count(*) from apm_packages where package_key = 'intranet-cost-center'}"]
+    set pcenter_p [util_memoize [db_string pcent "select count(*) from apm_packages where package_key = 'intranet-cost-center'"]]
     if {!$pcenter_p} { return "t" }
 
     return [db_string cc_perms "
@@ -420,6 +425,6 @@ ad_proc -public im_user_cost_centers { user_id } {
     Returns the list of all cost-centes of the user
     including sub cost-centers
 } {
-    im_security_alert_check_integer -location "im_user_cost_centers" -value $user_id
+    im_security_alert_check_integer -location "im_user_cost_centers: user_id" -value $user_id
     return [util_memoize [list db_list user_ccs "select * from im_user_cost_centers($user_id)"]]
 }
