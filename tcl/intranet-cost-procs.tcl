@@ -245,7 +245,7 @@ ad_proc -public im_cost_type_write_permissions {
     Returns a list of all cost_type_ids for which the user has
     write permissions for atleast one Cost Center.
 } {
-    return [util_memoize "im_cost_type_write_permissions_helper $user_id" 60]
+    return [util_memoize [list im_cost_type_write_permissions_helper $user_id] 60]
 }
 
 
@@ -935,6 +935,7 @@ ad_proc im_costs_base_component {
     Returns a HTML table containing a list of costs for a particular
     company or project.
 } {
+    im_security_alert_check_integer -location "im_costs_base_component: project_id" -value $project_id
     if {![im_permission $user_id view_costs]} {
 	return ""
     }
@@ -1558,7 +1559,7 @@ ad_proc im_costs_project_finance_component {
     append prelim_cost_html "<td align=right>- $subtotal $default_currency</td>\n"
     set grand_total [expr $grand_total - $subtotal]
 
-    append prelim_cost_html "</tr>\n<tr>\n<td>[lang::message::lookup "" intranet-cost.Expenses "Expenses"]</td>\n"
+    append prelim_cost_html "</tr>\n<tr>\n<td>[lang::message::lookup "" intranet-cost.Expense_Budget "Expense Budget"]</td>\n"
     set subtotal $subtotals([im_cost_type_expense_planned])
     append prelim_cost_html "<td align=right>- $subtotal $default_currency</td>\n"
     set grand_total [expr $grand_total - $subtotal]
@@ -1793,7 +1794,7 @@ ad_proc -public im_cost_status_select {
     $default with a list of all the cost status_types in the system
 } {
     set include_empty 0
-    set options [util_memoize "im_cost_status_options $include_empty"]
+    set options [util_memoize [list im_cost_status_options $include_empty]]
 
     set result "\n<select name=\"$select_name\">\n"
     if {[string equal $default ""]} {
