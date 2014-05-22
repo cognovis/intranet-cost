@@ -410,7 +410,7 @@ ad_proc -public im_cost_center_write_p_helper {
     Returns "t" if the user can write to the CC, "f" otherwise.
 } {
     # User can write all CCs if no Profit Center Controlling is installed
-    set pcenter_p [util_memoize [db_string pcent "select count(*) from apm_packages where package_key = 'intranet-cost-center'"]]
+    set pcenter_p [util_memoize [list db_string pcent "select count(*) from apm_packages where package_key = 'intranet-cost-center'"]]
     if {!$pcenter_p} { return "t" }
 
     return [db_string cc_perms "
