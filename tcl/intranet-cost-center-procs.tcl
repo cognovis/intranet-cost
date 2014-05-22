@@ -373,17 +373,15 @@ ad_proc -public im_cc_read_p {
     if {0 == $user_id} { set user_id [ad_get_user_id] }
     if {0 == $cost_center_id} { set cost_center_id [im_cost_center_company] }
     if {0 != $cost_type_id} {
-	set privilege [util_memoize "db_string priv \"
+	set privilege [util_memoize [list db_string priv "
 		select read_privilege 
 		from im_cost_types 
 		where cost_type_id = $cost_type_id
-	\" -default \"\" "]
+	" -default ""]]
     }
     if {"" == $privilege} { set privilege "fi_read_all" }
 
-    set true_false [util_memoize "db_string company_cc_read \"
-	select	im_object_permission_p($cost_center_id, $user_id, '$privilege')
-    \" -default f" 60]
+    set true_false [util_memoize [list db_string company_cc_read "select im_object_permission_p($cost_center_id, $user_id, '$privilege')" -default f] 60]
     return [string equal "t" $true_false]
 }
 
