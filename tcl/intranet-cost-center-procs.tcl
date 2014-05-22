@@ -342,7 +342,7 @@ ad_proc -private -deprecated im_cost_center_read_p_helper {
     Returns "t" if the user can read the CC, "f" otherwise.
 } {
     # User can read all CCs if no Profit Center Controlling is installed
-    set pcenter_p [util_memoize [db_string pcent "select count(*) from apm_packages where package_key = 'intranet-cost-center'"]]
+    set pcenter_p [util_memoize [list db_string pcent "select count(*) from apm_packages where package_key = 'intranet-cost-center'"]]
     if {!$pcenter_p} { return "t" }
 
     return [db_string cc_perms "
@@ -362,7 +362,7 @@ ad_proc -public im_cc_read_p {
     Returns "1" if the user can read the global "company" CC
 } {
     # User can read all CCs if no Profit Center Controlling is installed
-    set pcenter_p [util_memoize [db_string pcent "select count(*) from apm_packages where package_key = 'intranet-cost-center'"]]
+    set pcenter_p [util_memoize [list db_string pcent "select count(*) from apm_packages where package_key = 'intranet-cost-center'"]]
     if {!$pcenter_p} { return 1 }
     im_security_alert_check_integer -location "im_cc_read_p: user_id" -value $user_id
     im_security_alert_check_integer -location "im_cc_read_p: cost_type_id" -value $cost_type_id
