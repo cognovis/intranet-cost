@@ -86,7 +86,7 @@ ad_proc -public im_payment_method_cash {} { return 802 }
 
 ad_proc -public im_package_cost_id { } {
 } {
-    return [util_memoize "im_package_cost_id_helper"]
+    return [util_memoize im_package_cost_id_helper]
 }
 
 ad_proc -private im_package_cost_id_helper {} {
@@ -1249,6 +1249,7 @@ ad_proc im_costs_project_finance_component {
     set default_currency [ad_parameter -package_id [im_package_cost_id] "DefaultCurrency" "" "EUR"]
 
     # project_id may get overwritten by SQL query
+    im_security_alert_check_integer -location "im_costs_project_finance_component: project_id" -value $project_id
     set org_project_id $project_id
 
     # Get a hash array of subtotals per cost_type
