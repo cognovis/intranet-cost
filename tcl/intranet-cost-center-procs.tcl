@@ -35,6 +35,7 @@ ad_proc -public im_cost_center_name {
     Returns the cached name of a cost center
 } {
     if {"" == $cost_center_id || ![string is integer $cost_center_id]} { set cost_center_id 0}
+    im_security_alert_check_integer -location "im_cost_center_name: cost_center_id" -value $cost_center_id
     return [util_memoize [list db_string ccname "select cost_center_name from im_cost_centers where cost_center_id = $cost_center_id" -default ""]]
 }
 
@@ -78,17 +79,18 @@ ad_proc -public im_department_options { {include_empty 0} } {
 }
 
 ad_proc -public im_cost_center_select { 
-    {-include_empty 0} 
-    {-include_empty_name "" }
-    {-department_only_p 0} 
+    { -include_empty 0 } 
+    { -include_empty_name "" }
+    { -department_only_p 0 } 
+    { -show_inactive_cc_p 0 }
     {-manager_id ""}
     select_name 
-    {default ""} 
-    {cost_type_id ""} 
+    { default "" } 
+    { cost_type_id "" } 
 } {
     Returns a select box with all Cost Centers in the company.
 } {
-    set options [im_cost_center_options -include_empty $include_empty -include_empty_name $include_empty_name -department_only_p $department_only_p -cost_type_id $cost_type_id -manager_id $manager_id]
+    set options [im_cost_center_options -include_empty $include_empty -include_empty_name $include_empty_name -department_only_p $department_only_p -cost_type_id $cost_type_id -show_inactive_cc_p $show_inactive_cc_p -manager_id $manager_id]
 
     # Only one option, so 
     # write out string instead of select component
@@ -106,18 +108,18 @@ ad_proc -public im_cost_center_select {
 
 
 ad_proc -public im_cost_center_options { 
-    {-include_empty 0} 
-    {-include_empty_name "" }
-    {-department_only_p 0} 
-    {-cost_type_id ""} 
-    {-parent_id ""}
-    {-indent_level 0}
+    { -include_empty 0 } 
+    { -include_empty_name "" }
+    { -department_only_p 0 } 
+    { -cost_type_id ""} 
+    { -show_inactive_cc_p 0 } 
     {-manager_id ""}
 } {
     Returns a list of all Cost Centers in the company.
     Takes into account the permission of the user to 
     charge FinDocs to CostCenters
 } {
+
     set user_id [ad_get_user_id]
     set start_center_id [im_cost_center_company]
     set cost_type "Invalid"
@@ -127,7 +129,7 @@ ad_proc -public im_cost_center_options {
     set short_name [im_cost_type_short_name $cost_type_id]
 
     # Profit-Center-Module (perms on CCs) installed?
-    set pcenter_p [util_memoize "db_string pcent {select count(*) from apm_packages where package_key = 'intranet-cost-center'}"]
+    set pcenter_p [util_memoize [list db_string pcent "select count(*) from apm_packages where package_key = 'intranet-cost-center'"]]
 
     if {$pcenter_p && "" != $cost_type_id} { 
 	set cost_type_sql "and im_object_permission_p(cost_center_id, :user_id, 'fi_write_${short_name}s') = 't'\n"
@@ -136,6 +138,12 @@ ad_proc -public im_cost_center_options {
     set department_only_sql ""
     if {$department_only_p} {
 	set department_only_sql "and cc.department_p = 't'"
+    }
+
+    if { $show_inactive_cc_p } {
+	set status_sql "1=1"
+    } else {
+        set status_sql "cost_center_status_id in (select * from im_sub_categories([im_cost_center_status_active]))"
     }
 
     set parent_sql ""
@@ -154,11 +162,12 @@ ad_proc -public im_cost_center_options {
 
     set options_sql "
         select	cc.cost_center_name,
-                cc.cost_center_id
+                cc.cost_center_id,
+                cc.cost_center_label,
+		cost_center_status_id
         from	im_cost_centers cc
-	where	cost_center_status_id in (
-			select * from im_sub_categories([im_cost_center_status_active])
-		)
+	where	
+		$status_sql
 		$department_only_sql
 		$cost_type_sql
                 $parent_sql
@@ -169,6 +178,7 @@ ad_proc -public im_cost_center_options {
 
     
     set options [list]
+
     if {$include_empty && $parent_id eq ""} { lappend options [list $include_empty_name ""] }
 
     # make sure we pass the correct indent level
@@ -184,7 +194,12 @@ ad_proc -public im_cost_center_options {
 	    for {set i 0} {$i < $indent_level} { incr i } {
 		append spaces "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
 	    }
-	    lappend options [list "$spaces$cost_center_name" $cost_center_id]
+	    if { $cost_center_status_id == [im_cost_center_status_inactive] } {
+		# this would not work, investigate when time: lappend options [list "$spaces<span class='select_option_inactive'>$cost_center_name</span>" $cost_center_id]
+		lappend options [list "$spaces$cost_center_name&nbsp;([lang::message::lookup "" intranet-core.Inactive "Inactive"])" $cost_center_id]
+	    } else {
+		lappend options [list "$spaces$cost_center_name" $cost_center_id]
+	    }
 	    set options [concat $options  [im_cost_center_options \
 					       -include_empty $include_empty \
 					       -include_empty_name $include_empty_name \
@@ -200,6 +215,7 @@ ad_proc -public im_cost_center_options {
     }
 
     return $options
+
 }
 
 
@@ -349,7 +365,7 @@ ad_proc -public -deprecated im_cost_center_read_p {
     expensive with a considerable number of financial docs.
 } {
     if {"" == $cost_center_id} { return 1 }
-    return [string equal "t" [util_memoize "im_cost_center_read_p_helper $cost_center_id $cost_type_id $user_id" 60]]
+    return [string equal "t" [util_memoize [list im_cost_center_read_p_helper $cost_center_id $cost_type_id $user_id] 60]]
 }
 
 ad_proc -private -deprecated im_cost_center_read_p_helper {
@@ -360,7 +376,7 @@ ad_proc -private -deprecated im_cost_center_read_p_helper {
     Returns "t" if the user can read the CC, "f" otherwise.
 } {
     # User can read all CCs if no Profit Center Controlling is installed
-    set pcenter_p [util_memoize "db_string pcent {select count(*) from apm_packages where package_key = 'intranet-cost-center'}"]
+    set pcenter_p [util_memoize [list db_string pcent "select count(*) from apm_packages where package_key = 'intranet-cost-center'"]]
     if {!$pcenter_p} { return "t" }
 
     return [db_string cc_perms "
@@ -380,24 +396,26 @@ ad_proc -public im_cc_read_p {
     Returns "1" if the user can read the global "company" CC
 } {
     # User can read all CCs if no Profit Center Controlling is installed
-    set pcenter_p [util_memoize "db_string pcent {select count(*) from apm_packages where package_key = 'intranet-cost-center'}"]
+    set pcenter_p [util_memoize [list db_string pcent "select count(*) from apm_packages where package_key = 'intranet-cost-center'"]]
     if {!$pcenter_p} { return 1 }
+    im_security_alert_check_integer -location "im_cc_read_p: user_id" -value $user_id
+    im_security_alert_check_integer -location "im_cc_read_p: cost_type_id" -value $cost_type_id
+    im_security_alert_check_integer -location "im_cc_read_p: cost_center_id" -value $cost_center_id
+    im_security_alert_check_alphanum -location "im_cc_read_p: privilege" -value $privilege
 
     # Deal with exceptions
     if {0 == $user_id} { set user_id [ad_get_user_id] }
     if {0 == $cost_center_id} { set cost_center_id [im_cost_center_company] }
     if {0 != $cost_type_id} {
-	set privilege [util_memoize "db_string priv \"
+	set privilege [util_memoize [list db_string priv "
 		select read_privilege 
 		from im_cost_types 
 		where cost_type_id = $cost_type_id
-	\" -default \"\" "]
+	" -default ""]]
     }
     if {"" == $privilege} { set privilege "fi_read_all" }
 
-    set true_false [util_memoize "db_string company_cc_read \"
-	select	im_object_permission_p($cost_center_id, $user_id, '$privilege')
-    \" -default f" 60]
+    set true_false [util_memoize [list db_string company_cc_read "select im_object_permission_p($cost_center_id, $user_id, '$privilege')" -default f] 60]
     return [string equal "t" $true_false]
 }
 
@@ -413,7 +431,7 @@ ad_proc -public im_cost_center_write_p {
     expensive with a considerable number of financial docs.
 } {
     if {"" == $cost_center_id} { return 1 }
-    return [string equal "t" [util_memoize "im_cost_center_write_p_helper $cost_center_id $cost_type_id $user_id" 60]]
+    return [string equal "t" [util_memoize [list im_cost_center_write_p_helper $cost_center_id $cost_type_id $user_id] 60]]
 }
 
 ad_proc -public im_cost_center_write_p_helper {
@@ -424,7 +442,7 @@ ad_proc -public im_cost_center_write_p_helper {
     Returns "t" if the user can write to the CC, "f" otherwise.
 } {
     # User can write all CCs if no Profit Center Controlling is installed
-    set pcenter_p [util_memoize "db_string pcent {select count(*) from apm_packages where package_key = 'intranet-cost-center'}"]
+    set pcenter_p [util_memoize [list db_string pcent "select count(*) from apm_packages where package_key = 'intranet-cost-center'"]]
     if {!$pcenter_p} { return "t" }
 
     return [db_string cc_perms "
@@ -439,7 +457,7 @@ ad_proc -public im_user_cost_centers { user_id } {
     Returns the list of all cost-centes of the user
     including sub cost-centers
 } {
-    im_security_alert_check_integer -location "im_user_cost_centers" -value $user_id
+    im_security_alert_check_integer -location "im_user_cost_centers: user_id" -value $user_id
     return [util_memoize [list db_list user_ccs "select * from im_user_cost_centers($user_id)"]]
 }
 

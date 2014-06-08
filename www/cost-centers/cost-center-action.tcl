@@ -31,11 +31,14 @@ if {0 == [llength $cost_center_list]} {
     ad_returnredirect $return_url
 }
 
+
+set top_company_cc [im_cost_center_company]
+
 if {[catch {
 
     db_transaction {
-	db_dml null_cc "update im_employees set department_id = null where department_id in ([join $cost_center_list ", "])"
-	db_dml null_cc "update im_costs set cost_center_id = null where cost_center_id in ([join $cost_center_list ", "])"
+	db_dml null_cc "update im_employees set department_id = :top_company_cc where department_id in ([join $cost_center_list ", "])"
+	db_dml null_cc "update im_costs set cost_center_id = :top_company_cc where cost_center_id in ([join $cost_center_list ", "])"
 	db_dml del_cost_centers "delete from im_cost_centers where cost_center_id in ([join $cost_center_list ", "])"
 	db_dml del_cc_objects "delete from acs_objects where object_id in ([join $cost_center_list ", "])"
     }

@@ -35,24 +35,24 @@ set group_url "/admin/groups/one"
 set bgcolor(0) " class=rowodd"
 set bgcolor(1) " class=roweven"
 
-if {"" == $return_url} {
-    set return_url [ad_conn url]
-}
+if {"" == $return_url} { set return_url [ad_conn url] }
+
+
+set help_str "<ul><li>To show CC in right order please set 'Cost Center Code' accordingly. For additional help please see 'Context Help' that is provided for this page</li>" 
+append help_str "<li><span>Please note:</span><br>Deleting Cost Centers from a productive system should be the exception. Whenever possible, set them to 'inactive'."
+append help_str "If a Cost Center is removed from the system, all related costs will be transfered to the default Cost Center 'The Company'.</li></ul>"
+set help_txt [lang::message::lookup "" intranet-cost.Cost_Center_help $help_str]
+
 
 set table_header "
 <tr>
   <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
-"
-
-append table_header "
   <td class=rowtitle align=center>[lang::message::lookup "" intranet-cost.CostCenter "Cost Center Code"]</td>
-  <td class=rowtitle align=center>[lang::message::lookup "" intranet-cost.DeptQuest "Dept?"]</td>
+  <td class=rowtitle align=center>[lang::message::lookup "" intranet-cost.DepartmentP "Department?"]</td>
+  <td class=rowtitle align=center>[lang::message::lookup "" intranet-cost.CostCenterStatus "Status"]</td>
   <td class=rowtitle align=center>[lang::message::lookup "" intranet-cost.InheritFrom "Inherit Permsissons From"]</td>
   <td class=rowtitle align=center>[lang::message::lookup "" intranet-cost.Manager "Manager"]</td>
   <td class=rowtitle align=center>[lang::message::lookup "" intranet-cost.Employees "Employees"]</td>
-"
-
-append table_header "
   <td class=rowtitle>[im_gif del "Delete Cost Center"]</td>
 </tr>
 "
@@ -94,32 +94,26 @@ set last_id 0
 set space "&nbsp; &nbsp; &nbsp; "
 
 db_foreach cost_centers $main_sql {
-
     incr ctr
     set object_id $cost_center_id
     append table "\n<tr$bgcolor([expr $ctr % 2])>\n"
+
     set sub_indent ""
     for {set i 1} {$i < $tree_level} {incr i} { append sub_indent $space }
-    if {$last_id != $cost_center_id} {
-	append table "<td>
-	    <nobr>$sub_indent
-	    <A href=$cost_center_url?cost_center_id=$cost_center_id&return_url=$return_url
-	    >$cost_center_name</A>
-	    </nobr>
-            <td>$cost_center_code</td>
-	  </td>
-	  <td>$department_p</td>
-	  <td>$context</td>
-	  <td><a href=[export_vars -base "/intranet/users/view" -override {{user_id $manager_id}}]>$manager_name</a></td>
+
+    set cost_center_status [im_category_from_id $cost_center_status_id] 
+
+    if { $last_id != $cost_center_id } {
+        append table "
+		<td><nobr>$sub_indent <a href=$cost_center_url?cost_center_id=$cost_center_id&return_url=$return_url>$cost_center_name</a></nobr></td>
+	        <td>$cost_center_code</td>
+		<td>$department_p</td>
+		<td>$cost_center_status</td>
+		<td>$context</td>
+		<td><a href=[export_vars -base "/intranet/users/view" -override {{user_id $manager_id}}]>$manager_name</a></td>
 	"
     } else {
-	append table "
-	       <td></td>
-	       <td></td>
-	       <td></td>
-	       <td></td>
-	       <td></td>
-	"
+	append table "<td colspan='6'></td>"
     }
 
     append table "
@@ -129,25 +123,27 @@ db_foreach cost_centers $main_sql {
 	  <td>
        "
     
-    if {$last_id!=$cost_center_id} {
-	append table "<input type=checkbox name=cost_center_id.$cost_center_id>"
-    }
+    # Add checkbox to last column when cc line
+    if {$last_id!=$cost_center_id} { append table "<input type=checkbox name=cost_center_id.$cost_center_id>" }
 
     append table "
 	  </td>
 	</tr>
     "
-	set last_id $cost_center_id
-
+    set last_id $cost_center_id
 }
 
 append table "
-	<tr>
-	  <td colspan=9 align=right>
-	    <A href=new?[export_url_vars return_url]>New Cost Center</a>
-	  </td>
-	  <td>
-	    <input type=submit value='Del'>
-	  </td>
-	</tr>
+        <tr>
+          <td colspan='10' align=right><input type='submit' value='Del'></td>
+        </tr>
+"
+
+append left_navbar_html "
+        <div class='filter-block'>
+	        <div class='filter-title'>#intranet-cost.AdminCostCenter#</div>
+		<ul>
+		    <li><a href=new?[export_url_vars return_url]>[lang::message::lookup "" intranet-cost.CreateNewCostCenter "Create new Cost Center"]</a</li>
+		</ul>
+        </div>
 "

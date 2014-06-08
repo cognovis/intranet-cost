@@ -1501,17 +1501,17 @@ select acs_privilege__add_child('admin', 'view_costs');
 select acs_privilege__create_privilege('add_costs','Add Costs','Add Costs');
 select acs_privilege__add_child('admin', 'add_costs');
 
+select acs_privilege__create_privilege('fi_view_internal_rates','FI View internal rates','FI View internal rates');
+select acs_privilege__add_child('admin', 'fi_view_internal_rates');
+
 select im_priv_create('view_costs','Accounting');
-select im_priv_create('view_costs','P/O Admins');
 select im_priv_create('view_costs','Senior Managers');
 
 select im_priv_create('add_costs','Accounting');
-select im_priv_create('add_costs','P/O Admins');
 select im_priv_create('add_costs','Senior Managers');
 
-
-
-
+select im_priv_create('add_costs','Accounting');
+select im_priv_create('fi_view_internal_rates', 'Senior Managers');
 
 
 
