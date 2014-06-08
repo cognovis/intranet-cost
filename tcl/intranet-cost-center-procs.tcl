@@ -113,7 +113,9 @@ ad_proc -public im_cost_center_options {
     { -department_only_p 0 } 
     { -cost_type_id ""} 
     { -show_inactive_cc_p 0 } 
-    {-manager_id ""}
+    { -parent_id "" }
+    { -indent_level 0 }
+    { -manager_id "" }
 } {
     Returns a list of all Cost Centers in the company.
     Takes into account the permission of the user to 
@@ -190,6 +192,8 @@ ad_proc -public im_cost_center_options {
 	foreach cost_center_option $cost_center_options {
 	    set cost_center_name [lindex $cost_center_option 0]
 	    set cost_center_id [lindex $cost_center_option 1]
+	    set cost_center_label [lindex $cost_center_option 2]
+	    set cost_center_status_id [lindex $cost_center_option 3]
 	    set spaces ""
 	    for {set i 0} {$i < $indent_level} { incr i } {
 		append spaces "&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;"
