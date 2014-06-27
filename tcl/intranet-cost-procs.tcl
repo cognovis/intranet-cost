@@ -110,7 +110,7 @@ ad_proc -public im_cost_type_is_invoice_or_quote_p { cost_type_id } {
     Invoices and Quotes have a "Company" fields,
     so we need to identify them:
 } {
-    set invoice_or_quote_p [expr $cost_type_id == [im_cost_type_invoice] || $cost_type_id == [im_cost_type_quote] || $cost_type_id == [im_cost_type_delivery_note] || $cost_type_id == [im_cost_type_interco_invoice] || $cost_type_id == [im_cost_type_interco_quote]]
+    set invoice_or_quote_p [expr $cost_type_id == [im_cost_type_invoice] || $cost_type_id == [im_cost_type_quote] || $cost_type_id == [im_cost_type_delivery_note] || $cost_type_id == [im_cost_type_interco_invoice] || $cost_type_id == [im_cost_type_interco_quote] || $cost_type_id == [im_cost_type_correction_invoice]]
     return $invoice_or_quote_p
 }
 
@@ -119,7 +119,7 @@ ad_proc -public im_cost_type_is_invoice_or_bill_p { cost_type_id } {
     Invoices and Bills have a "Payment Terms" field.
     So we need to identify them:
 } {
-    set invoice_or_bill_p [expr $cost_type_id == [im_cost_type_invoice] || $cost_type_id == [im_cost_type_bill]]
+    set invoice_or_bill_p [expr $cost_type_id == [im_cost_type_invoice] || $cost_type_id == [im_cost_type_bill] || $cost_type_id == [im_cost_type_correction_invoice] || $cost_type_id == [im_cost_type_correction_bill]]
     return $invoice_or_bill_p
 }
 
