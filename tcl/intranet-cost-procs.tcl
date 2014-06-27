@@ -45,12 +45,15 @@ ad_proc -public im_cost_type_timesheet {} { return 3718 }
 ad_proc -public im_cost_type_expense_item {} { return 3720 }
 ad_proc -public im_cost_type_expense_bundle {} { return 3722 }
 ad_proc -public im_cost_type_delivery_note {} { return 3724 }
+ad_proc -public im_cost_type_correction_invoice {} { return 3725 }
 ad_proc -public im_cost_type_timesheet_planned {} { return 3726 }
 ad_proc -public im_cost_type_timesheet_budget {} { return 3726 }
 ad_proc -public im_cost_type_expense_planned {} { return 3728 }
 ad_proc -public im_cost_type_interco_invoice {} { return 3730 }
 ad_proc -public im_cost_type_interco_quote {} { return 3732 }
 ad_proc -public im_cost_type_provider_receipt {} { return 3734 }
+ad_proc -public im_cost_type_correction_bill {} { return 3725 }
+
 # Fake cost types for timesheet _hours_
 ad_proc -public im_cost_type_timesheet_hours {} { return 3736 }
 

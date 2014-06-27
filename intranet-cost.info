@@ -9,15 +9,15 @@
     <singleton-p>t</singleton-p>
     <auto-mount>intranet-cost</auto-mount>
 
-    <version name="4.1.0.0.0" url="http://www.project-open.org/download/apm/intranet-cost-4.1.0.0.0.apm">
+    <version name="4.1.0.0.1" url="http://www.project-open.org/download/apm/intranet-cost-4.1.0.0.1.apm">
         <owner url="mailto:frank.bergmann@project-open.com">Frank Bergmann</owner>
         <summary>Base for cost management</summary>
         <vendor url="http://www.project-open.com/">]project-open[</vendor>
         <description format="text/plain">Defines cost centers, cost items and investments</description>
 
-        <provides url="intranet-cost" version="4.0.3.1.3"/>
+        <provides url="intranet-cost" version="4.1.0.0.1"/>
         <requires url="acs-subsite" version="5.1.3"/>
-        <requires url="intranet-core" version="3.0.0.0.0"/>
+        <requires url="intranet-core" version="4.1.0.0.0"/>
         <requires url="intranet-exchange-rate" version="3.0.0.0.0"/>
         <requires url="intranet-search-pg" version="4.0.0.0.0"/>
 
