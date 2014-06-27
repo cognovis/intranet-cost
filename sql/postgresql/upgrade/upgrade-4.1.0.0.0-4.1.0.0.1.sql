@@ -27,7 +27,7 @@ BEGIN
 		values (3735, 'Provide Bill Correction', 'Intranet Cost Type', 
 			3735);
 	END IF;
-    PERFORM im_category_hierarchy_new (3725, 3710);
+    PERFORM im_category_hierarchy_new (3735, 3710);
 
 	return 0;
 end;$body$ language 'plpgsql';
