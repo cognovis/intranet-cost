@@ -959,9 +959,9 @@ ad_proc im_costs_base_component {
     set object_name ""
     set new_doc_args ""
     if {"" != $company_id} { 
-	lappend extra_where "(ci.customer_id = :company_id OR ci.provider_id = :company_id)" 
-	set object_name [db_string object_name "select company_name from im_companies where company_id = :company_id"]
-	set new_doc_args "?company_id=$company_id"
+        	lappend extra_where "(ci.customer_id = :company_id OR ci.provider_id = :company_id)" 
+        	set object_name [db_string object_name "select company_name from im_companies where company_id = :company_id"]
+        	set new_doc_args "?company_id=$company_id"
     }
 
     if {"" != $project_id} { 
@@ -1043,6 +1043,7 @@ ad_proc im_costs_base_component {
 	    <td align=center class=rowtitle>[_ intranet-cost.Due]</td>
 	    <td align=center class=rowtitle>[_ intranet-cost.Amount]</td>
 	    <td align=center class=rowtitle>[_ intranet-cost.Paid]</td>
+	    <td align=center class=rowtitle>[_ intranet-cost.Linked]</td>
 	  </tr>
     "
     set ctr 1
@@ -1051,76 +1052,122 @@ ad_proc im_costs_base_component {
 
     db_foreach recent_costs $costs_sql {
 
-	append cost_html "
-		<tr$bgcolor([expr $ctr % 2])>
-		  <td><A href=\"$url$cost_id\">[string range $cost_name 0 20]</A></td>
-		  <td>$cost_type</td>
-		  <td>$calculated_due_date</td>
-		  <td>$amount $currency</td>
-		  <td>$payment_amount $payment_currency</td>
-		</tr>
-	"
-	incr ctr
-	if {$ctr > $max_costs} { break }
-    }
+        set linked_cost_ids [relation::get_objects -object_id_two $cost_id -rel_type "im_invoice_invoice_rel"]
+        set linked_cost_ids [concat [relation::get_objects -object_id_one $cost_id -rel_type "im_invoice_invoice_rel"] $linked_cost_ids]
+        if {$linked_cost_ids eq ""} {
+            # this might be a parent, try it again for children
+            set linked_cost_ids [relation::get_objects -object_id_one $cost_id -rel_type "im_invoice_invoice_rel"]
+        }
 
-    # Restore the original values after SQL selects
-    set project_id $org_project_id
-    set company_id $org_company_id
-
-    append cost_html "
-		<tr$bgcolor([expr $ctr % 2])>
-		  <td colspan=$colspan>
-		    <A HREF=/intranet-cost/list?[export_url_vars status_id company_id project_id]>
-		      [_ intranet-cost.more_costs]
-		    </A>
-		  </td>
-		</tr>
-    "
-
-    # Add a reasonable message if there are no documents
-    if {$ctr == 1} {
-	append cost_html "
-		<tr$bgcolor([expr $ctr % 2])>
-		  <td colspan=$colspan align=center>
-		    <I>[_ intranet-cost.lt_No_financial_document]</I>
-		  </td>
-		</tr>
-	"
-	incr ctr
-    }
-
-
+        set linked_list_html ""
+        if {$linked_cost_ids ne ""} {
+                
+            set linked_list_sql "
+                select
+                    cost_id as linked_cost_id,
+                    cost_name as linked_cost_name
+                from
+                    im_costs
+                where
+                    cost_id in ([template::util::tcl_to_sql_list $linked_cost_ids])
+            "
+        
+            db_foreach linked_list $linked_list_sql {
+                append linked_list_html "
+                    <A href=$url$linked_cost_id>
+                      $linked_cost_name
+                     </A>
+                "
+            }
+        
+        
+            append linked_list_html "</ul>"
+        }
+        
+        	append cost_html "
+        		<tr$bgcolor([expr $ctr % 2])>
+        		  <td><A href=\"$url$cost_id\">[string range $cost_name 0 20]</A></td>
+        		  <td>$cost_type</td>
+        		  <td>$calculated_due_date</td>
+        		  <td>$amount $currency</td>
+        		  <td>$payment_amount $payment_currency</td>
+        		  <td>$linked_list_html</td>
+        		</tr>
+        	"
+        	incr ctr
+        	if {$ctr > $max_costs} { break }
+            }
+        
+            # Restore the original values after SQL selects
+            set project_id $org_project_id
+            set company_id $org_company_id
+        
+            append cost_html "
+        		<tr$bgcolor([expr $ctr % 2])>
+        		  <td colspan=$colspan>
+        		    <A HREF=/intranet-cost/list?[export_url_vars status_id company_id project_id]>
+        		      [_ intranet-cost.more_costs]
+        		    </A>
+        		  </td>
+        		</tr>
+            "
+        
+            # Add a reasonable message if there are no documents
+            if {$ctr == 1} {
+        	append cost_html "
+        		<tr$bgcolor([expr $ctr % 2])>
+        		  <td colspan=$colspan align=center>
+        		    <I>[_ intranet-cost.lt_No_financial_document]</I>
+        		  </td>
+        		</tr>
+        	"
+        	incr ctr
+            }
+        
     # Add some links to create new financial documents
     # if the intranet-invoices module is installed
     if {[im_table_exists im_invoices]} {
 
-	# Project Documents:
-	if {"" != $project_id} {
+        	# Project Documents:
+        	if {"" != $project_id} {
+            append cost_html "
+            	<tr class=rowplain>
+            <td colspan=$colspan>\n"
 
-	    append cost_html "
-	<tr class=rowplain>
-	  <td colspan=$colspan>\n"
+            # Customer invoices: customer = Project Customer, provider = Internal
+            set customer_id [util_memoize [list db_string project_customer "select company_id from im_projects where project_id = $project_id" -default ""]]
+            set provider_id [im_company_internal]
+            set bind_vars [list customer_id $customer_id provider_id $provider_id project_id $project_id]
+            append cost_html [im_menu_ul_list "invoices_customers" $bind_vars]
 
+            # Provider invoices: customer = Internal, no provider yet defined
+            set customer_id [im_company_internal]
+            set bind_vars [list customer_id $customer_id project_id $project_id]
+            append cost_html [im_menu_ul_list "invoices_providers" $bind_vars]
+            
+            append cost_html "	
+	            </td>
+	           </tr>
+	       "
+	       incr ctr
 
-	    # Customer invoices: customer = Project Customer, provider = Internal
-	    set customer_id [util_memoize [list db_string project_customer "select company_id from im_projects where project_id = $project_id" -default ""]]
-	    set provider_id [im_company_internal]
-	    set bind_vars [list customer_id $customer_id provider_id $provider_id project_id $project_id]
-      	    append cost_html [im_menu_ul_list "invoices_customers" $bind_vars]
-
-	    # Provider invoices: customer = Internal, no provider yet defined
-	    set customer_id [im_company_internal]
-	    set bind_vars [list customer_id $customer_id project_id $project_id]
-	    append cost_html [im_menu_ul_list "invoices_providers" $bind_vars]
-
-	    append cost_html "	
-	  </td>
-	</tr>
-	"
-	    incr ctr
-
-	} 
+        } else {
+            append cost_html "
+                <tr class=rowplain>
+                <td colspan=$colspan>\n"
+            
+            set company_type_id [util_memoize [list db_string type_id "select company_type_id from im_companies where company_id = $company_id" -default ""]]
+            
+            if {[lsearch [im_sub_categories [im_company_type_provider]] $company_type_id]} {
+                set bind_vars [list customer_id [im_company_internal] provider_id $provider_id]
+                append cost_html [im_menu_ul_list "invoices_providers" $bind_vars]                
+            }
+            append cost_html "	
+                </td>
+                </tr>
+               "
+            incr ctr
+        } 
     }
 
     append cost_html "</table>\n"
