@@ -53,7 +53,7 @@ set table_header "
   <td class=rowtitle align=center>[lang::message::lookup "" intranet-cost.InheritFrom "Inherit Permsissons From"]</td>
   <td class=rowtitle align=center>[lang::message::lookup "" intranet-cost.Manager "Manager"]</td>
   <td class=rowtitle align=center>[lang::message::lookup "" intranet-cost.Employees "Employees"]</td>
-  <td class=rowtitle>[im_gif del "Delete Cost Center"]</td>
+  <td class=rowtitle>[im_gif -translate_p 1 del "Delete Cost Center"]</td>
 </tr>
 "
 

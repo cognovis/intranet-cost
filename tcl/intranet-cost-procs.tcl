@@ -2261,7 +2261,7 @@ ad_proc -public im_cost_project_document_icons_helper {
 
     set result ""
     set alt_txt [lang::message::lookup "" intranet-cost.Financial Financials]
-    append result "<a href='[export_vars -base "/intranet/projects/view" {project_id {view_name finance}}]' target='_'>[im_gif "money_dollar" $alt_txt]</a>\n"
+    append result "<a href='[export_vars -base "/intranet/projects/view" {project_id {view_name finance}}]' target='_'>[im_gif -translate_p 0 "money_dollar" $alt_txt]</a>\n"
     db_foreach fin_docs $costs_sql {
 	switch $cost_type_id {
 	    3700 { set gif "i" }
@@ -2271,7 +2271,7 @@ ad_proc -public im_cost_project_document_icons_helper {
 	    default { set gif "cross" }
 	}
 	set alt_txt "$cost_name, [lang::message::lookup "" intranet-cost.Amount Amount]:$amount_converted"
-	append result "<a href='[export_vars -base "/intranet-invoices/view" {{invoice_id $cost_id}}]' target='_'>[im_gif $gif $alt_txt]</a>\n"
+	append result "<a href='[export_vars -base "/intranet-invoices/view" {{invoice_id $cost_id}}]' target='_'>[im_gif -translate_p 0 $gif $alt_txt]</a>\n"
     }
 
     return $result
