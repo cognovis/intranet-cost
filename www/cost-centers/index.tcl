@@ -1,6 +1,6 @@
 # /packages/intranet-cost/www/cost-centers/index.tcl
 #
-# Copyright (C) 2003 - 2009 ]project-open[
+# Copyright (C) 2003 - now Project Open Business Solutions S.L.
 #
 # All rights reserved. Please check
 # http://www.project-open.com/license/ for details.
@@ -48,7 +48,8 @@ set table_header "
 <tr>
   <td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</td>
   <td class=rowtitle align=center>[lang::message::lookup "" intranet-cost.CostCenter "Cost Center Code"]</td>
-  <td class=rowtitle align=center>[lang::message::lookup "" intranet-cost.DepartmentP "Department?"]</td>
+  <td class=rowtitle align=center>[lang::message::lookup "" intranet-cost.Type "Type"]</td>
+  <td class=rowtitle align=center>[lang::message::lookup "" intranet-cost.DepartmentP "Dpt.?"]</td>
   <td class=rowtitle align=center>[lang::message::lookup "" intranet-cost.CostCenterStatus "Status"]</td>
   <td class=rowtitle align=center>[lang::message::lookup "" intranet-cost.InheritFrom "Inherit Permsissons From"]</td>
   <td class=rowtitle align=center>[lang::message::lookup "" intranet-cost.Manager "Manager"]</td>
@@ -64,6 +65,7 @@ set table_header "
 set main_sql "
 	select distinct
 		m.*,
+		im_name_from_id(m.cost_center_type_id) as cost_center_type_name,
 		length(cost_center_code) / 2 as indent_level,
 		(9 - (length(cost_center_code)/2)) as colspan_level,
 		im_name_from_user_id(m.manager_id) as manager_name,
@@ -107,6 +109,7 @@ db_foreach cost_centers $main_sql {
         append table "
 		<td><nobr>$sub_indent <a href=$cost_center_url?cost_center_id=$cost_center_id&return_url=$return_url>$cost_center_name</a></nobr></td>
 	        <td>$cost_center_code</td>
+		<td>$cost_center_type_name</td>
 		<td>$department_p</td>
 		<td>$cost_center_status</td>
 		<td>$context</td>
