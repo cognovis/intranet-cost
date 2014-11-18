@@ -68,7 +68,8 @@
   <msg key="Manager">Manager</msg>
   <msg key="Materials_Service_Types">Materialien (Service Typen)</msg>
   <msg key="more_costs">Weitere Dokumente...</msg>
-  <msg key="Multiple_Currency_Warning">&lt;h2&gt;Inkonsistene Währungen&lt;/h2&gt; &lt;p&gt; 
+  <msg key="Multiple_Currency_Warning">&lt;h2&gt;Inkonsistene Währungen&lt;/h2&gt; &lt;p&gt; 
+
 Dieses Finanzdokument enhält mehr als eine Währung.</msg>
   <msg key="Name">Name</msg>
   <msg key="New_Cost">Neue Kosten</msg>
