@@ -4,6 +4,13 @@
   <msg key="Absences">Absences</msg>
   <msg key="Accounts_Payable">Accounts Payable</msg>
   <msg key="Accounts_Receivable">Accounts Receivable</msg>
+  <msg key="Ad_hoc_document_nr">No.</msg>
+  <msg key="Ad_hoc_cost_center">CC</msg>
+  <msg key="Ad_hoc_customer_name">Customer</msg>
+  <msg key="Ad_hoc_due_date">Due</msg>
+  <msg key="Ad_hoc_amount">Amount</msg>
+  <msg key="Ad_hoc_paid_amount">Paid</msg>  
+  <msg key="Ad_hoc_provider_name">Provider</msg>
   <msg key="Admin">Admin</msg>
   <msg key="AdminCostCenter">Admin Cost Center</msg>
   <msg key="Administration">Administration</msg>
