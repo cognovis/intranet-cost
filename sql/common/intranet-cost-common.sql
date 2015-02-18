@@ -111,6 +111,7 @@ SELECT im_category_new (3812,'Deleted','Intranet Cost Status');
 SELECT im_category_new (3814,'Filed','Intranet Cost Status');
 SELECT im_category_new (3816,'Requested','Intranet Cost Status');
 SELECT im_category_new (3818,'Rejected','Intranet Cost Status');
+SELECT im_category_new (3820,'Accepted','Intranet Cost Status');
 -- reserved until 3899
 
 

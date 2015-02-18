@@ -26,6 +26,7 @@ ad_proc -public im_cost_status_deleted {} { return 3812 }
 ad_proc -public im_cost_status_filed {} { return 3814 }
 ad_proc -public im_cost_status_requested {} { return 3816 }
 ad_proc -public im_cost_status_rejected {} { return 3818 }
+ad_proc -public im_cost_status_accepted {} { return 3820 }
 
 
 
