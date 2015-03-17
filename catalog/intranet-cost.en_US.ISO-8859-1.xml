@@ -10,6 +10,11 @@
   <msg key="All_Costs">All Costs</msg>
   <msg key="Amount">Amount</msg>
   <msg key="Amount_without_VAT">Amount without VAT</msg>
+  <msg key="cc_invoice_text_525"></msg>
+  <msg key="cc_invoice_text_526"></msg>
+  <msg key="cc_invoice_text_12356"></msg>
+  <msg key="cc_invoice_text_34915"></msg>
+  <msg key="cc_invoice_text_34917"></msg>
   <msg key="Client">Customer</msg>
   <msg key="Companies">Companies</msg>
   <msg key="Company">Company</msg>
@@ -59,6 +64,7 @@
   <msg key="Grand_Total">Grand Total</msg>
   <msg key="InheritFrom">Inherit From</msg>
   <msg key="Investment">Investment</msg>
+  <msg key="Linked">Linked</msg>
   <msg key="lt_Cost_Item_Administrat">Cost Item Administration</msg>
   <msg key="lt_Create_a_new_purchase">Create a new purchase order</msg>
   <msg key="lt_Didnt_find_the_the_vi">Didn't find the the view '%$view_name%'</msg>

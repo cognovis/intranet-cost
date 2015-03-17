@@ -930,9 +930,10 @@ ad_proc im_costs_project_component { user_id project_id } {
 
 
 ad_proc im_costs_base_component { 
+    {-show_links_p "1"}
     user_id 
     {company_id ""} 
-    {project_id ""} 
+    {project_id ""}
 } {
     Returns a HTML table containing a list of costs for a particular
     company or project.
@@ -1127,7 +1128,7 @@ ad_proc im_costs_base_component {
         
     # Add some links to create new financial documents
     # if the intranet-invoices module is installed
-    if {[im_table_exists im_invoices]} {
+    if {[im_table_exists im_invoices] && $show_links_p} {
 
         	# Project Documents:
         	if {"" != $project_id} {
