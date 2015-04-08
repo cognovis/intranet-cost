@@ -110,7 +110,27 @@ ad_form -extend -name cost_center -on_request {
 
 } -new_data {
 
-    set cost_center_id [db_string cost_center_insert {}]
+    set cost_center_id [db_string cost_center_insert {
+        SELECT im_cost_center__new (
+            null,			-- cost_center_id
+            'im_cost_center',	-- object_type
+            now(),			-- creation_date
+            null,			-- creation_user
+            null,			-- creation_ip
+            :parent_id,			-- context_id
+        
+            :cost_center_name,
+            :cost_center_label,
+            :cost_center_code,
+            :cost_center_type_id,
+            :cost_center_status_id,
+            :parent_id,
+            :manager_id,
+            :department_p,
+            :description,
+            :note
+        )
+    }]
     
     # 2014-02-20 fraber: Generates a strange error.
     # Why was this necessary in the first place?
@@ -145,6 +165,11 @@ ad_form -extend -name cost_center -on_request {
 		cost_center_id = :cost_center_id
     "
 
+
+    db_dml cost_center_context_update "update acs_objects set 
+        context_id = :parent_id
+        where	object_id = :cost_center_id
+        "
     # 2014-02-20 fraber: Generates a strange error.
     # Why was this necessary in the first place?
     # db_dml cost_center_context_update {}
@@ -169,6 +194,7 @@ ad_form -extend -name cost_center -on_request {
 
 
 } -after_submit {
+
 
 	ad_returnredirect $return_url
 	ad_script_abort
