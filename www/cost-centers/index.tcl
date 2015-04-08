@@ -105,7 +105,7 @@ db_foreach cost_centers $main_sql {
 
     if { $last_id != $cost_center_id } {
         append table "
-		<td><nobr>$sub_indent <a href=$cost_center_url?cost_center_id=$cost_center_id&return_url=$return_url>$cost_center_name</a></nobr></td>
+		<td><nobr><font size=-4>(#$cost_center_id)</font>$sub_indent <a href=$cost_center_url?cost_center_id=$cost_center_id&return_url=$return_url>$cost_center_name</a></nobr></td>
 	        <td>$cost_center_code</td>
 		<td>$department_p</td>
 		<td>$cost_center_status</td>
