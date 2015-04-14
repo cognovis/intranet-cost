@@ -1161,7 +1161,7 @@ ad_proc im_costs_base_component {
             set company_type_id [util_memoize [list db_string type_id "select company_type_id from im_companies where company_id = $company_id" -default ""]]
             
             if {[lsearch [im_sub_categories [im_company_type_provider]] $company_type_id]>-1} {
-                set bind_vars [list customer_id [im_company_internal] provider_id $provider_id]
+                set bind_vars [list customer_id [im_company_internal] provider_id $company_id]
                 append cost_html [im_menu_ul_list "invoices_providers" $bind_vars]                
             }
             append cost_html "	
