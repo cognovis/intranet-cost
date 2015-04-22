@@ -188,6 +188,8 @@ ad_proc -public im_cost_center_options {
 
     if {"" != $parent_id} {
         	set parent_sql "and cc.parent_id = :parent_id"
+    } else {
+        set parent_sql ""
     }
     
 
