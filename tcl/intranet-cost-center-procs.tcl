@@ -40,6 +40,32 @@ ad_proc -public im_cost_center_name {
 }
 
 # -----------------------------------------------------------
+# Permissions
+# -----------------------------------------------------------
+
+ad_proc -public im_cost_center_permissions {user_id cost_center_id view_var read_var write_var admin_var} {
+    Fill the "by-reference" variables read, write and admin
+    with the permissions of $user_id on $cost_center_id.<br>
+} {
+    upvar $view_var view
+    upvar $read_var read
+    upvar $write_var write
+    upvar $admin_var admin
+
+    set user_is_admin_p [im_is_user_site_wide_or_intranet_admin $user_id]
+    set cc_admin_id [util_memoize [list db_string cc_admin "select manager_id from im_cost_centers where cost_center_id = $cost_center_id" -default ""]]
+    set user_is_cc_admin_p [expr $user_id == $cc_admin_id]
+
+    # -----------------------------------------------------
+    # Set the permission as the OR-conjunction of provider and customer
+    set view 1
+    set read 1
+    set write [expr $user_is_admin_p || $user_is_cc_admin_p]
+    set admin $write
+}
+
+
+# -----------------------------------------------------------
 # Options & Selects
 # -----------------------------------------------------------
 

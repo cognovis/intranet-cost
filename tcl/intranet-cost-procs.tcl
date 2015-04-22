@@ -291,17 +291,29 @@ ad_proc -public im_cost_type_write_permissions_helper {
 # -----------------------------------------------------------
 
 ad_proc -public im_cost_uom_options { 
+    {-locale ""}
+    {-translate_p 1}
     {include_empty 1} 
 } {
     Cost UoM (Unit of Measure) options
 } {
-    set options [db_list_of_lists cost_type_options "
+    if {"" == $locale && $translate_p} { set locale [lang::user::locale -user_id [ad_get_user_id]] }
+
+    set options_sql "
         select	category, category_id
         from	im_categories
 	where	category_type = 'Intranet UoM' and
 		(enabled_p is null OR enabled_p = 't')
-    "]
-    if {$include_empty} { set options [linsert $options 0 { "" "" }] }
+    "
+    set options [list]
+    if {$include_empty} { set options [list "" ""] }
+    db_foreach uom_options $options_sql {
+	set category_l10n $category
+	if {$translate_p} {
+	    set category_l10n [lang::message::lookup $locale intranet-core.[lang::util::suggest_key $category] $category]
+	}
+	lappend options [list $category_l10n $category_id]
+    }
     return $options
 }
 
@@ -597,7 +609,6 @@ ad_proc -public im_costs_navbar {
             ns_log Debug "im_costs_navbar: $var <- $value"
         }
     }
-
     set alpha_bar [im_alpha_bar -prev_page_url $prev_page_url -next_page_url $next_page_url $base_url $default_letter $bind_vars]
 
     # Get the Subnavbar
@@ -1725,8 +1736,7 @@ ad_proc im_costs_project_finance_component {
 
 
     set summary_html ""
-
-    if {1} {
+    if {$show_details_p} {
 
 	# Summary in broad format
 	set summary_html "
@@ -2219,34 +2229,34 @@ ad_proc -public im_navbar_tree_finance {
     set current_user_id [ad_get_user_id]
 
     set html "
-	<li><a href=/intranet-cost/>[lang::message::lookup "" intranet-cost.Finance "Finance"]</a>
+	<li><a href=\"/intranet-cost/\">[lang::message::lookup "" intranet-cost.Finance "Finance"]</a>
 	<ul>
-	<li><a href=$wiki/module_finance>[lang::message::lookup "" intranet-core.Finance_Help "Finance Help"]</a>
+	<li><a href=\"$wiki/module_finance\">[lang::message::lookup "" intranet-core.Finance_Help "Finance Help"]</a>
 
-		<li><a href=/intranet-invoices/list?cost_type_id=3708>[lang::message::lookup "" intranet-cost.New_Customer_Invoices_Quotes "New Cust. Invoices &amp; Quotes"]</a>
+		<li><a href=\"/intranet-invoices/list?cost_type_id=3708\">[lang::message::lookup "" intranet-cost.New_Customer_Invoices_Quotes "New Cust. Invoices &amp; Quotes"]</a>
 		<ul>
 			[im_navbar_write_tree -package_key "intranet-invoices" -label "invoices_customers" -maxlevel 0]
 		</ul>
-		<li><a href=/intranet-invoices/list?cost_type_id=3710>[lang::message::lookup "" intranet-cost.New_Provider_Bills_POs "New Prov. Bills &amp; POs"]</a>
+		<li><a href=\"/intranet-invoices/list?cost_type_id=3710\">[lang::message::lookup "" intranet-cost.New_Provider_Bills_POs "New Prov. Bills &amp; POs"]</a>
 		<ul>
 			[im_navbar_write_tree -package_key "intranet-invoices" -label "invoices_providers" -maxlevel 0]
 		</ul>
-		<li><a href=/intranet-invoices/list?cost_status_id=3802&cost_type_id=3700>[lang::message::lookup "" intranet-cost.Accounts_Receivable "Accounts Receivable"]</a></li>
-		<li><a href=/intranet-invoices/list?cost_status_id=3802&cost_type_id=3704>[lang::message::lookup "" intranet-cost.Accounts_Payable "Accounts Payable"]</a></li>
-		<li><a href=/intranet-payments/index>[lang::message::lookup "" intranet-cost.Payments Payments]</a></li>
-		<li><a href=/intranet-dw-light/invoices.csv>[lang::message::lookup "" intranet-cost.Export_Finance_to_CSV "Export Finance to CSV/Excel"]</a></li>
+		<li><a href=\"/intranet-invoices/list?cost_status_id=3802&cost_type_id=3700\">[lang::message::lookup "" intranet-cost.Accounts_Receivable "Accounts Receivable"]</a></li>
+		<li><a href=\"/intranet-invoices/list?cost_status_id=3802&cost_type_id=3704\">[lang::message::lookup "" intranet-cost.Accounts_Payable "Accounts Payable"]</a></li>
+		<li><a href=\"/intranet-payments/index\">[lang::message::lookup "" intranet-cost.Payments Payments]</a></li>
+		<li><a href=\"/intranet-dw-light/invoices.csv\">[lang::message::lookup "" intranet-cost.Export_Finance_to_CSV "Export Finance to CSV/Excel"]</a></li>
 
-		<li><a href=/intranet-reporting/>[lang::message::lookup "" intranet-core.Reporting Reporting]</a>
+		<li><a href=\"/intranet-reporting/\">[lang::message::lookup "" intranet-core.Reporting Reporting]</a>
                 <ul>
                 [im_navbar_write_tree -package_key "intranet-reporting" -label "reporting-finance" -maxlevel 1]
                 [im_navbar_write_tree -package_key "intranet-reporting" -label "reporting-timesheet" -maxlevel 1]
                 </ul>
 
-		<li><a href=/intranet/admin/>[lang::message::lookup "" intranet-cost.Admin Admin]</a>
+		<li><a href=\"/intranet/admin/\">[lang::message::lookup "" intranet-cost.Admin Admin]</a>
 		<ul>
 			[im_menu_li admin_cost_centers]
 			[im_menu_li finance_exchange_rates]
-			<li><a href=/intranet-material/>[lang::message::lookup "" intranet-cost.Materials_Service_Types "Materials (Service Types)"]</a>
+			<li><a href=\"/intranet-material/\">[lang::message::lookup "" intranet-cost.Materials_Service_Types "Materials (Service Types)"]</a></li>
 		</ul>
 	</ul>
     "
@@ -2324,7 +2334,7 @@ ad_proc -public im_cost_project_document_icons_helper {
 
     set result ""
     set alt_txt [lang::message::lookup "" intranet-cost.Financial Financials]
-    append result "<a href='[export_vars -base "/intranet/projects/view" {project_id {view_name finance}}]' target='_'>[im_gif "money_dollar" $alt_txt]</a>\n"
+    append result "<a href=\"[export_vars -base "/intranet/projects/view" {project_id {view_name finance}}]\" target=\"_\">[im_gif -translate_p 0 "money_dollar" $alt_txt]</a>\n"
     db_foreach fin_docs $costs_sql {
 	switch $cost_type_id {
 	    3700 { set gif "i" }
@@ -2334,9 +2344,8 @@ ad_proc -public im_cost_project_document_icons_helper {
 	    default { set gif "cross" }
 	}
 	set alt_txt "$cost_name, [lang::message::lookup "" intranet-cost.Amount Amount]:$amount_converted"
-	append result "<a href='[export_vars -base "/intranet-invoices/view" {{invoice_id $cost_id}}]' target='_'>[im_gif $gif $alt_txt]</a>\n"
+	append result "<a href=\"[export_vars -base "/intranet-invoices/view" {{invoice_id $cost_id}}]\" target=\"_\">[im_gif -translate_p 0 $gif $alt_txt]</a>\n"
     }
 
     return $result
-
 }
